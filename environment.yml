@@ -1,0 +1,60 @@
+name: null
+
+channels:
+  - rapidsai
+  - nvidia
+  - pytorch
+  - conda-forge
+  - defaults
+
+dependencies:
+  - bokeh
+  - captum
+  - cudnn
+  - cudatoolkit=11.2
+  - cupy
+  - dask
+  - dask-ml
+  - dask-labextension
+  - datashader
+  - featuretools
+  - gh
+  - git
+  - h5py
+  - holoviews
+  - hvplot
+  - imbalanced-learn
+  - jupyterlab
+  - jupyterlab-git
+  - jupyterlab-lsp
+  - jupyterlab-nvdashboard
+  - lightgbm
+  - matplotlib
+  - nccl
+  - numba
+  - numpy
+  - optuna
+  - pandas
+  - panel
+  - pip
+  - pip:
+    - -r file:requirements.txt
+  - pyarrow
+  - python=3.8
+  - python-language-server
+  - pytorch=1.9
+  - pytorch-lightning
+  - pyviz_comms
+  - rapids-blazing
+  - scikit-learn
+  - scipy
+  - shap
+  - tensorboard
+  - torchaudio
+  - torchtext
+  - torchvision
+  - umap-learn
+  - wandb
+  - xarray
+  - xeus-python
+  - xgboost
