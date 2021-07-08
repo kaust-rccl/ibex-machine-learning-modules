@@ -11,7 +11,7 @@ dependencies:
   - bokeh
   - captum
   - cudnn
-  - cudatoolkit=11.2
+  - cudatoolkit=11.0
   - cupy
   - dask
   - dask-ml
@@ -42,14 +42,14 @@ dependencies:
   - pyarrow
   - python=3.8
   - python-language-server
-  - pytorch=1.9
+  - pytorch=1.7
   - pytorch-lightning
   - pyviz_comms
-  - rapids-blazing
+  - rapids-blazing=21.06
   - scikit-learn
   - scipy
   - shap
-  - tensorboard
+  - tensorboard=2.4
   - torchaudio
   - torchtext
   - torchvision
