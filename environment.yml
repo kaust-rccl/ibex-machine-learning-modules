@@ -1,4 +1,4 @@
-name: null
+name: machine-learning-2021.09
 
 channels:
   - rapidsai
@@ -38,14 +38,14 @@ dependencies:
   - panel
   - pip
   - pip:
-    - -r file:requirements.txt
+    - -r requirements.txt
   - pyarrow
   - python=3.8
   - python-language-server
   - pytorch=1.7
   - pytorch-lightning
   - pyviz_comms
-  - rapids-blazing=21.06
+  - rapids-blazing=21.08
   - scikit-learn
   - scipy
   - shap
