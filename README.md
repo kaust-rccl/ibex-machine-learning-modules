@@ -35,3 +35,5 @@ Be sure to confirm that the channel priority in the `exported-environment.yml` f
 in the `environment.yml` file. If the channel priorities are not the same, then manually edit the channel priorities 
 of the `exported-environment.yml` file to match those of the `environment.yml` file.
 
+Note that the `exported-environment.yml` file provided above was created *after* building the `machine_learning` 
+module on Ibex in order to accurately reflect the packages, version, and builds installed in the production module.
