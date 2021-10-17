@@ -1,5 +1,5 @@
 pandas-bokeh
-jax
+jax==0.2.16
 jaxlib==0.1.68+cuda110
 tensorflow==2.4
 
