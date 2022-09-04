@@ -8,12 +8,18 @@ channels:
   - defaults
 
 dependencies:
-  - astunparse=1.6
+  - rapids=22.08
+  - dask-sql=2022.8.0
+  - jupyterlab=3.4.5
+  - dash=2.6.1
+  - graphistry=0.27.1
+  - pycaret=2.2.3
+  - xarray-spatial=0.3.5
+  - astunparse=1.6.3
   - bokeh
   - captum
   - cudnn
-  - cudatoolkit=11.0
-  - cudatoolkit-dev=11.0
+
   - cupy
   - dask
   - dask-ml

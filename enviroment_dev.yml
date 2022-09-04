@@ -1,0 +1,27 @@
+# add channels for rapids, tensorflow for gpu, pytorch-lightning, and torchvision
+name: machine-learning-2022.09
+channels:
+  - rapidsai
+  - nvidia
+  - pytorch
+  - conda-forge
+  - defaults
+dependencies:
+  - rapids=22.08
+  - cudatoolkit=11.2
+  - python=3.9
+  - dask-sql=2022.8.0
+  - jupyterlab=3.4.5
+  - dash=2.6.1
+  - graphistry=0.27.1
+  - pycaret=2.2.3
+  - xarray-spatial=0.3.5
+  - jupyterlab-nvdashboard=0.1.0
+  - torchaudio=0.4.0
+  - torchtext=0.4.0
+  - torchvision=0.4.1
+  - xeus-python=0.8.0
+  - pytorch=1.7
+  - pytorch-lightning=0.6.0
+  - pip=22.1.2
+  
