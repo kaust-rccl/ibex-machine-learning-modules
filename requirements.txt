@@ -1,7 +1,3 @@
-pandas-bokeh
-jax==0.2.16
-jaxlib==0.1.68+cuda110
-tensorflow==2.4
-
---find-links https://storage.googleapis.com/jax-releases/jax_releases.html
-
+tensorflow==2.*
+dask-labextension==5.3.*
+jupyterlab-nvdashboard==0.7.*
