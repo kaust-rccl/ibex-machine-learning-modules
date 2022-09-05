@@ -1,5 +1,6 @@
 # add channels for rapids, tensorflow for gpu, pytorch-lightning, and torchvision
-name: machine-learning-2022.09
+name: machine-learning-2022.10
+# pytorch needs to be complied from source to use the same cuda as TF and rapids 
 channels:
   - rapidsai
   - rapidsai-nightly
@@ -9,7 +10,7 @@ channels:
   - defaults
 dependencies:
   - python=3.9
-  - cudatoolkit=11.2
+  - cudatoolkit=11.2 # pytorch uses cuda 11.3 or 10.2 ,TF uses cuda 11.2 , Rapids uses 11.2
   - rapids=22.08
   - dask-sql=2022.8.0
   - jupyterlab=3.4.5
@@ -17,20 +18,15 @@ dependencies:
   - graphistry=0.27.1
   - pycaret=2.2.3
   - xarray-spatial=0.3.5
-  - jupyterlab-nvdashboard
-  - torchaudio=0.12.1
-  - torchtext=0.13.1
-  - torchvision=0.13.1
-  - pytorch=1.12.1
-  - pytorch-lightning=1.6.5
-  # - grpc-cpp>=1.42.0,<1.47.0a0
-  # - icu>=69.1,<70.0a0
+  - jupyterlab-nvdashboard=0.7.0
+  # - torchaudio=0.12.1
+  # - torchtext=0.13.1
+  # - torchvision=0.13.1
+  # - pytorch=1.12.1
+  # - pytorch-lightning=1.6.5
   - jax=0.3.17
   - jaxlib=0.3.15
+  - ray-tune=1.13.0
   - pip=22.1.2
   - pip:
     - -r file:requirements.txt
-
-  # - hdf5 >=1.10.6,<1.10.7.0a0
-  # - tensorflow-base=2.*
-  # - tensorflow=2.*
