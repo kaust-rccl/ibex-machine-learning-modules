@@ -1,3 +1,0 @@
-tensorflow==2.*
-dask-labextension==5.3.*
-jupyterlab-nvdashboard==0.7.*
