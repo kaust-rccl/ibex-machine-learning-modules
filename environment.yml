@@ -21,4 +21,7 @@ dependencies :
   - hvplot
   - graphistry
   - pycaret
+  - ray-tune
+  - torchvision
+  - torchaudio
 
