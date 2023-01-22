@@ -2,6 +2,7 @@ name : null
 channels :
    - nvidia
    - rapidsai
+   - pytorch
    - conda-forge
 dependencies :
   - python=3.9
