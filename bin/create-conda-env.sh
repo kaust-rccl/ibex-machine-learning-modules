@@ -1,4 +1,7 @@
-#!/bin/bash --login
+#!/bin/bash
+
+export CONDA_PKGS_DIRS=/ibex/user/${USER}/conda_cache
+source /ibex/user/${USER}/miniconda3/bin/activate
 
 # entire script fails if a single command fails
 set -e
