@@ -32,6 +32,8 @@ dependencies :
   - streamlit-folium
   - prophet
   - ignite
+  - jsonschema-with-format-nongpl 
+  - webcolors
   - pip
   - pip :
     - torch-summary
