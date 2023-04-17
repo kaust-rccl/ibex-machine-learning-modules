@@ -5,7 +5,7 @@ channels :
    - pytorch
    - conda-forge
 dependencies :
-  - python=3.10
+  - python=3.8
   - pytorch-lightning
   - rapids=23.02
   - tensorflow
@@ -25,4 +25,7 @@ dependencies :
   - ray-tune
   - torchvision
   - torchaudio
+  - pip
+  - pip :
+    - torch-summary
 
