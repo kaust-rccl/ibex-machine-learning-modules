@@ -26,6 +26,12 @@ dependencies :
   - ray-tune
   - torchvision
   - torchaudio
+  - netcdf4
+  - streamlit
+  - folium
+  - streamlit-folium
+  - prophet
+  - ignite
   - pip
   - pip :
     - torch-summary
