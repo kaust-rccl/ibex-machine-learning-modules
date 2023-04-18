@@ -1,0 +1,40 @@
+name : null 
+channels :
+   - nvidia
+   - rapidsai
+   - pytorch
+   - conda-forge
+dependencies :
+  - python=3.8
+  - pytorch-lightning
+  - rapids=23.02
+  - tensorflow
+  - jax
+  - git
+  - jupyterlab
+  - jupyterlab-nvdashboard
+  - dask-labextension
+  - umap-learn
+  - wandb
+  - lightgbm
+  - gh
+  - holoviews
+  - hvplot
+  - graphistry
+  - pycaret
+  - xarray-spatial
+  - ray-tune
+  - torchvision
+  - torchaudio
+  - netcdf4
+  - streamlit
+  - folium
+  - streamlit-folium
+  - prophet
+  - ignite
+  - jsonschema-with-format-nongpl 
+  - webcolors
+  - pip
+  - pip :
+    - torch-summary
+
