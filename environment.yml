@@ -1,70 +1,40 @@
-name: machine-learning-2021.09
-
-channels:
-  - rapidsai
-  - nvidia
-  - pytorch
-  - conda-forge
-  - defaults
-
-dependencies:
-  - astunparse=1.6
-  - bokeh
-  - captum
-  - cudnn
-  - cudatoolkit=11.0
-  - cudatoolkit-dev=11.0
-  - cupy
-  - dask
-  - dask-ml
-  - dask-labextension
-  - datashader
-  - featuretools
-  - gast=0.3.3
-  - gh
-  - git
-  - google-pasta=0.2.0
-  - grpcio=1.32
-  - h5py=2.10
-  - holoviews
-  - hvplot
-  - imbalanced-learn
-  - jupyterlab
-  - jupyterlab-git
-  - jupyterlab-lsp
-  - jupyterlab-nvdashboard
-  - keras-preprocessing=1.1
-  - lightgbm
-  - matplotlib
-  - nccl
-  - numba
-  - numpy=1.19.5
-  - optuna
-  - pandas
-  - panel
-  - pip
-  - pip:
-    - -r requirements.txt
-  - pyarrow
+name : null 
+channels :
+   - nvidia
+   - rapidsai
+   - pytorch
+   - conda-forge
+dependencies :
   - python=3.8
-  - python-flatbuffers=1.12
-  - python-language-server
-  - pytorch=1.7
   - pytorch-lightning
-  - pyviz_comms
-  - rapids-blazing=21.06
-  - scikit-learn
-  - scipy
-  - shap
-  - six=1.15
-  - tensorboard=2.4
-  - termcolor=1.1
-  - torchaudio
-  - torchtext
-  - torchvision
-  - typing-extensions=3.7
+  - rapids=23.02
+  - tensorflow
+  - jax
+  - git
+  - jupyterlab
+  - jupyterlab-nvdashboard
+  - dask-labextension
   - umap-learn
   - wandb
-  - xarray
-  - xeus-python
-  - xgboost
+  - lightgbm
+  - gh
+  - holoviews
+  - hvplot
+  - graphistry
+  - pycaret
+  - xarray-spatial
+  - ray-tune
+  - torchvision
+  - torchaudio
+  - netcdf4
+  - streamlit
+  - folium
+  - streamlit-folium
+  - prophet
+  - ignite
+  - jsonschema-with-format-nongpl 
+  - webcolors
+  - pip
+  - pip :
+    - torch-summary
+
