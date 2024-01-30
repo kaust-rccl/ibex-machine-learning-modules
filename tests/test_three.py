@@ -1,16 +1,35 @@
-import torch
-import torch.nn as nn
-#check if cuda is available
-print("Is CUDA available: ", torch.cuda.is_available())
-#check if cuda is enabled
-print("Is CUDA enabled: ", torch.cuda.is_built_with_cuda())
-#check pytorch version
-print("Pytorch version: ", torch.__version__)
-#check tensor operation on GPU
-a = torch.tensor([1, 2, 3, 4, 5, 6, 7], dtype=torch.float32)
-b = torch.tensor([1, 2, 3, 4, 5, 6, 7], dtype=torch.float32)
-c = torch.matmul(a, b)
-# if this fails then you have a problem with your GPU
-print("Pytorch operation on GPU: ", c)
+import tensorflow as tf
 
+# Check GPU availability
+gpus = tf.config.experimental.list_physical_devices('GPU')
+if len(gpus) > 0:
+    print('Is there a GPU?                   .............. Yes')
+else:
+    print('Is there a GPU?                   .............. No')
+
+# Get number of GPUs
+print('How many GPUs do we have          .............. ',len(gpus))
+
+# Get GPU properties
+if len(gpus) > 0:
+    device_properties = tf.config.experimental.get_device_details(gpus[0])
+    print('GPU properties                    .............. ')
+    for key, value in device_properties.items():
+        print(f'    {key}: {value}')
+else:
+    print('GPU properties                    .............. Not available')
+
+# Get supported GPU micro-architectures
+print('Supported GPU micro-architectures .............. ',tf.config.experimental.list_physical_devices('GPU'))
+
+# Get current GPU micro-architecture
+#if len(gpus) > 0:
+#    major, minor = tf.config.experimental.get_device_capability(gpus[0])
+#    print('Which GPU micro-architecture is this?........... ',f'{major}.{minor}')
+#else:
+#    print('Which GPU micro-architecture is this?........... Not available')
+
+# Number of threads available on host
+# print('Number of threads available on host ............ ',tf.config.threading.intra_op_parallelism_threads())
+print('Number of threads available on host ............ ', tf.config.threading.get_intra_op_parallelism_threads() )
 

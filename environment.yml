@@ -1,40 +1,54 @@
-name : null 
-channels :
-   - nvidia
-   - rapidsai
-   - pytorch
-   - conda-forge
-dependencies :
-  - python=3.8
-  - pytorch-lightning
-  - rapids=23.02
-  - tensorflow
-  - jax
-  - git
+name: null
+channels:
+  - pytorch
+  - nvidia
+  - rapidsai
+  - conda-forge
+  - defaults
+dependencies:
+  - python=3.10
+  - rapids=23.12
+  - cuda-version=12.0
+  - dask-sql
   - jupyterlab
-  - jupyterlab-nvdashboard
-  - dask-labextension
-  - umap-learn
-  - wandb
-  - lightgbm
-  - gh
-  - holoviews
-  - hvplot
+  - dash
   - graphistry
-  - pycaret
   - xarray-spatial
-  - ray-tune
+  - pytorch
+  - graphistry
+  - dash
+  - jupyterlab
+  - dask-sql
+  - xarray-spatial
+  - pytorch
+  - pytorch-lightning
   - torchvision
   - torchaudio
+  - torchinfo
+  - jax
+  - gh
+  - lightgbm
+  - git
+  - wandb
+  - code-server
+  - dask-labextension
+  - hvplot
   - netcdf4
+  - holoviews
   - streamlit
   - folium
   - streamlit-folium
+  - seaborn
+  - dask-ml
+  - umap-learn
   - prophet
   - ignite
-  - jsonschema-with-format-nongpl 
+  - texlab
   - webcolors
-  - pip
-  - pip :
-    - torch-summary
-
+  - r-languageserver
+  - python-language-server
+  - jedi-language-server
+  - jsonschema-with-format-nongpl
+  - pip:
+    - tensorflow[and-cuda]
+    - numpy==1.24
