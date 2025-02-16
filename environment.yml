@@ -40,3 +40,7 @@ dependencies:
   - r-languageserver
   - jedi-language-server
   - jsonschema-with-format-nongpl
+  - jaxlib[build=*cuda*]
+  - ca-certificates
+  - certifi
+  - openssl
