@@ -17,6 +17,7 @@ dependencies:
   - dash
   - graphistry
   - nx-cugraph=25.08
+  - tensorflow-gpu
   - tensorflow
   - xarray-spatial
   - dask-sql
