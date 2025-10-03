@@ -42,3 +42,6 @@ dependencies:
   - r-languageserver
   - jedi-language-server
   - jsonschema-with-format-nongpl
+  - scikit-optimize
+  - catboost
+ 
