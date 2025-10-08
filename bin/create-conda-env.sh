@@ -1,5 +1,5 @@
 #!/bin/bash
-module load gcc cuda/11.8 
+#module load gcc cuda/11.8 
 
 export CONDA_PKGS_DIRS=/ibex/user/${USER}/conda_cache
 source /ibex/user/${USER}/miniconda3/bin/activate

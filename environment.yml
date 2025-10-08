@@ -2,53 +2,40 @@ name: null
 channels:
   - pytorch
   - nvidia
-  - rapidsai
+  - rapidsai-nightly
   - conda-forge
   - defaults
 dependencies:
-  - python=3.10
-  - rapids=23.12
-  - cuda-version=12.0
-  - dask-sql
-  - jupyterlab
-  - dash
-  - graphistry
-  - xarray-spatial
+  - rapids=24.08
+  - python=3.11
+  - cuda-version[version='>=12.0,<=12.5']
   - pytorch
-  - graphistry
-  - dash
-  - jupyterlab
-  - dask-sql
-  - xarray-spatial
-  - pytorch
-  - pytorch-lightning
   - torchvision
   - torchaudio
+  - pytorch-cuda
+  - jupyterlab
+  - dash
+  - graphistry
+  - tensorflow
+  - xarray-spatial
+  - dask-sql
+  - code-server
+  - dask-ml
   - torchinfo
+  - seaborn
   - jax
+  - dask-labextension
+  - streamlit
+  - streamlit-folium
+  - wandb
   - gh
   - lightgbm
   - git
-  - wandb
-  - code-server
-  - dask-labextension
-  - hvplot
-  - netcdf4
-  - holoviews
-  - streamlit
-  - folium
-  - streamlit-folium
-  - seaborn
-  - dask-ml
   - umap-learn
   - prophet
   - ignite
   - texlab
   - webcolors
   - r-languageserver
-  - python-language-server
   - jedi-language-server
   - jsonschema-with-format-nongpl
-  - pip:
-    - tensorflow[and-cuda]
-    - numpy==1.24

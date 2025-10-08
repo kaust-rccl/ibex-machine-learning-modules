@@ -8,7 +8,7 @@
 #SBATCH --mail-type=ALL
 #SBATCH --output=bin/%x-%j-slurm.out
 #SBATCH --error=bin/%x-%j-slurm.err
-module load gcc cuda/11.8
+# module load gcc cuda/11.8
 # create the conda environment
 
 export CONDA_PKGS_DIRS=/ibex/user/${USER}/conda_cache
