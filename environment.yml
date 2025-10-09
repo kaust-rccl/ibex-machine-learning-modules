@@ -9,16 +9,15 @@ dependencies:
   - rapids=25.08
   - python=3.12
   - cuda-version[version='>=12.0,<=12.9']
-  - pytorch
+  - "pytorch=2.5.1=*cuda*"
+  - "pytorch-mutex=*=cuda"
   - torchvision
   - torchaudio
-  - pytorch-cuda
   - jupyterlab
   - dash
   - graphistry
   - nx-cugraph=25.08
-  - tensorflow-gpu
-  - tensorflow
+  - "tensorflow=2.18.0=*cuda*"
   - xarray-spatial
   - dask-sql
   - code-server
