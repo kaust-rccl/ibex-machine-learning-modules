@@ -50,10 +50,17 @@ def test_cuda():
 def test_pytorch():
     import torch.nn as nn
     from torchinfo import summary
-    model = nn.Sequential(nn.Linear(10, 5), nn.ReLU(), nn.Linear(5, 2))
-    summary(model, input_size=(1, 10))
-    output = model(torch.randn(1, 10))
-    logging.info(f"Forward pass output: {output}")
+    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+    model = nn.Sequential(nn.Linear(10, 5), nn.ReLU(), nn.Linear(5, 2)).to(device)
+    # Optional: inspect where parameters live
+    # logging.info(f"Model params device: {next(model.parameters()).device}")
+    try:
+        summary(model, input_size=(1, 10), device=str(device))
+    except Exception:
+        pass
+    inp = torch.randn(1, 10, device=device)
+    output = model(inp)
+    logging.info(f"Forward pass output device: {output.device}, output: {output}")
 
 # TensorFlow Test
 def test_tensorflow():
