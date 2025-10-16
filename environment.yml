@@ -25,7 +25,7 @@ dependencies:
   - torchinfo
   - seaborn
   - jax
-  - jaxlib[build=*cuda*]
+  - "jaxlib=*=*cuda*"
   - dask-labextension
   - streamlit
   - streamlit-folium
