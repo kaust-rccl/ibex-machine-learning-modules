@@ -47,10 +47,42 @@ echo "[INFO] Container built successfully: ${TARGET_DIR}/${CONTAINER_NAME}" | te
 # Verify container exists and is readable
 if [ ! -r "${TARGET_DIR}/${CONTAINER_NAME}" ]; then
   echo "$PACKAGE - Container file not readable - installation failed"
+  echo "[ERROR] Build failed - keeping artifacts for debugging" | tee -a install.log
+  echo "[ERROR] Debug info:" | tee -a install.log
+  echo "  - Build directory: ${INSTALL_BUILD_PATH}" | tee -a install.log
+  echo "  - Expected container: ${TARGET_DIR}/${CONTAINER_NAME}" | tee -a install.log
+  echo "  - Log file: ${TARGET_DIR}/install.log" | tee -a install.log
   exit 1
 fi
 
 echo "[INFO] Container verification successful" | tee -a install.log
+
+# SUCCESS - Clean up build artifacts
+echo "[INFO] Cleaning up build artifacts..." | tee -a install.log
+
+# Remove cloned repository (largest space consumer)
+if [ -d "${INSTALL_BUILD_PATH}" ]; then
+  echo "[INFO] Removing cloned repository: ${INSTALL_BUILD_PATH}" | tee -a install.log
+  rm -rf "${INSTALL_BUILD_PATH}"
+fi
+
+# Remove copied script
+if [ -f "${TARGET_DIR}/run_install.sh" ]; then
+  echo "[INFO] Removing copied run_install.sh" | tee -a install.log
+  rm -f "${TARGET_DIR}/run_install.sh"
+fi
+
+# Archive logs with timestamp
+if [ -f "install.log" ]; then
+  BUILD_TIMESTAMP=$(date +%Y%m%d_%H%M%S)
+  echo "[INFO] Archiving build logs to build_${BUILD_TIMESTAMP}.tar.gz" | tee -a install.log
+  tar -czf "${TARGET_DIR}/build_${BUILD_TIMESTAMP}.tar.gz" install.log 2>/dev/null || true
+  rm -f install.log
+  echo "Build completed successfully at $(date)" >> "${TARGET_DIR}/build_archive.log"
+  echo "Archive: build_${BUILD_TIMESTAMP}.tar.gz" >> "${TARGET_DIR}/build_archive.log"
+fi
+
+echo "[INFO] Cleanup complete - build archive created"
 
 ############################### if this far, return 0
 exit 0

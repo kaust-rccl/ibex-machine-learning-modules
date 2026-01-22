@@ -60,8 +60,17 @@ $CONTAINER_CMD build -f --nv --force --tmpdir $TMP_BUILD_DIR "$OUTPUT_IMAGE" "$D
 
 BUILD_EXIT_CODE=$?
 
-# Clean up
-rm -rf "$TMP_BUILD_DIR"
+# Conditional cleanup based on build result
+if [ $BUILD_EXIT_CODE -eq 0 ]; then
+    echo ""
+    echo "Cleaning up temporary build files..."
+    rm -rf "$TMP_BUILD_DIR"
+    echo "Cleanup complete"
+else
+    echo ""
+    echo "Build failed - keeping temporary files for debugging"
+    echo "Temporary build directory: $TMP_BUILD_DIR"
+fi
 
 if [ $BUILD_EXIT_CODE -eq 0 ]; then
     echo ""
