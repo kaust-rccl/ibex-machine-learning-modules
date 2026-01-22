@@ -3,6 +3,7 @@ From: nvcr.io/nvidia/cuda-dl-base:25.11-cuda13.0-runtime-ubuntu24.04
 Stage: build
 
 %post
+    chmod 1777 /tmp
     # ============================================================
     # STAGE 1: BUILD - Install all dependencies and tools
     # ============================================================
@@ -10,6 +11,7 @@ Stage: build
     echo "Starting build stage..."
     
     # Setup temporary directory to avoid /tmp permission issues on HPC
+    chmod 1777 /tmp
     export TMPDIR=/var/tmp
     export TEMP=/var/tmp
     export TMP=/var/tmp
