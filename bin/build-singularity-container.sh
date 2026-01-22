@@ -56,13 +56,7 @@ echo "Starting container build..."
 echo "This may take 30-60 minutes depending on network speed and system resources"
 echo ""
 
-$CONTAINER_CMD build \
-    -f \
-    --nv \
-    --force \    
-    --tmpdir /ibex/user/$USER/singularity_tmp \    
-    "$OUTPUT_IMAGE" \
-    "$DEFINITION_FILE"
+$CONTAINER_CMD build -f --nv --force --tmpdir $TMP_BUILD_DIR "$OUTPUT_IMAGE" "$DEFINITION_FILE"
 
 BUILD_EXIT_CODE=$?
 
