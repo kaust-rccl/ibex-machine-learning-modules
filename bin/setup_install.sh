@@ -19,7 +19,7 @@ mkdir -p "$TARGET_DIR"
 chmod g+w "$TARGET_DIR"
 
 # Copy run_install.sh into the new directory
-cp run_install.sh "$TARGET_DIR/"
+cp ./bin/run_install.sh "$TARGET_DIR/"
 
 # Change to the new directory and execute the script
 cd "$TARGET_DIR"
@@ -27,4 +27,4 @@ bash run_install.sh
 
 # Create a module file
 cd "$PREFIX"
-bash generate_modulefile.sh
+bash ./bin/generate_modulefile.sh
