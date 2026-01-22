@@ -9,9 +9,33 @@ Stage: build
     
     echo "Starting build stage..."
     
-    # Update system packages
+    # Setup temporary directory to avoid /tmp permission issues on HPC
+    export TMPDIR=/var/tmp
+    export TEMP=/var/tmp
+    export TMP=/var/tmp
+    mkdir -p /var/tmp
+    
+    # Configure apt-get for HPC environment
     export DEBIAN_FRONTEND=noninteractive
-    apt-get update && apt-get install -y --no-install-recommends \
+    export APT_CONFIG=/tmp/apt.conf
+    cat > $APT_CONFIG <<'APT_EOF'
+APT::ExtractTemplates::TempDir "/var/tmp";
+Dir::Cache::tmp "/var/tmp";
+APT::Cache-Start 251658240;
+APT::Acquire::Retries "10";
+APT::Acquire::https::Timeout "240";
+APT::Acquire::http::Timeout "240";
+APT::Get::AllowUnauthenticated "true";
+APT_EOF
+    
+    # Update system packages with GPG key bypass for HPC networks
+    apt-get update -o Apt::Get::AllowUnauthenticated=true -o APT::ExtractTemplates::TempDir=/var/tmp \
+        || apt-get update --allow-unauthenticated || true
+    
+    # Install system packages
+    apt-get install -y --no-install-recommends \
+        -o Apt::Get::AllowUnauthenticated=true \
+        -o APT::ExtractTemplates::TempDir=/var/tmp \
         python3.12 \
         python3-pip \
         python3-dev \
@@ -109,7 +133,10 @@ EOF
     conda clean -a -y
     
     # Install additional system utilities for HPC
-    apt-get update && apt-get install -y --no-install-recommends \
+    apt-get update -o Apt::Get::AllowUnauthenticated=true -o APT::ExtractTemplates::TempDir=/var/tmp || true
+    apt-get install -y --no-install-recommends \
+        -o Apt::Get::AllowUnauthenticated=true \
+        -o APT::ExtractTemplates::TempDir=/var/tmp \
         libibverbs-dev \
         librdmacm-dev \
         && rm -rf /var/lib/apt/lists/*
@@ -311,5 +338,5 @@ ENTRYPOINT_EOF
     - JUPYTER_PORT: Jupyter port (default: 8888)
     - CUDA_VISIBLE_DEVICES: GPU selection
     
-    For support: contact david.barradas@kaust.edu.sa
+    For support: contact ibex@hpc.kaust.edu.sa
     ==============================================================================

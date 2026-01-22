@@ -59,7 +59,8 @@ echo ""
 $CONTAINER_CMD build \
     -f \
     --nv \
-    --force \
+    --force \    
+    --tmpdir /ibex/user/$USER/singularity_tmp \    
     "$OUTPUT_IMAGE" \
     "$DEFINITION_FILE"
 
