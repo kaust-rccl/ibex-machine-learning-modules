@@ -6,9 +6,9 @@
 
 set -e
 
-# Configuration
-DEFINITION_FILE="ml_module.def"
-OUTPUT_IMAGE="ml_module_v1.0.sif"
+# Configuration - accept parameters or use defaults
+DEFINITION_FILE="${1:-ml_module.def}"
+OUTPUT_IMAGE="${2:-ml_module_v1.0.sif}"
 BUILD_DIR="$PWD"
 
 echo "=========================================="
@@ -18,13 +18,6 @@ echo "Definition file: $DEFINITION_FILE"
 echo "Output image: $OUTPUT_IMAGE"
 echo "Build directory: $BUILD_DIR"
 echo ""
-
-# Check if running as root or with sudo (required for Singularity build)
-if [ "$EUID" -ne 0 ]; then 
-    echo "ERROR: This script must be run as root or with sudo"
-    echo "Usage: ./build-singularity-container.sh"
-    exit 1
-fi
 
 # Check if Singularity/Apptainer is installed
 if command -v singularity &> /dev/null; then
