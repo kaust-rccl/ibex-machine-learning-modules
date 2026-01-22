@@ -6,6 +6,14 @@
 
 set -e
 
+# Load Singularity module on HPC cluster
+module load singularity
+
+# Setup Singularity cache directory
+mkdir -p /ibex/user/$USER/singularity_cache
+export SINGULARITY_CACHEDIR=/ibex/user/$USER/singularity_cache
+unset SINGULARITY_BIND
+
 # Configuration - accept parameters or use defaults
 DEFINITION_FILE="${1:-ml_module.def}"
 OUTPUT_IMAGE="${2:-ml_module_v1.0.sif}"
@@ -49,9 +57,9 @@ echo "This may take 30-60 minutes depending on network speed and system resource
 echo ""
 
 $CONTAINER_CMD build \
+    -f \
     --nv \
     --force \
-    --fakeroot \
     "$OUTPUT_IMAGE" \
     "$DEFINITION_FILE"
 
