@@ -31,8 +31,13 @@ fi
 echo "[INFO] Building Singularity container from ml_module.def..." | tee -a install.log
 cd "${INSTALL_BUILD_PATH}"
 
-# Build the Singularity container
-if ! singularity build "${TARGET_DIR}/${CONTAINER_NAME}" ml_module.def 2>&1 | tee -a install.log; then
+# Build the Singularity container using build-singularity-container.sh
+if [ ! -f "../bin/build-singularity-container.sh" ]; then
+  echo "$PACKAGE - build-singularity-container.sh not found - installation failed"
+  exit 1
+fi
+
+if ! bash ../bin/build-singularity-container.sh ml_module.def "${TARGET_DIR}/${CONTAINER_NAME}" 2>&1 | tee -a install.log; then
   echo "$PACKAGE - Singularity container build failure - installation failed"
   exit 1
 fi
