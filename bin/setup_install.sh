@@ -2,15 +2,15 @@
 set -euo pipefail
 
 # Export all variables needed by run_install.sh
-export VERSION="2025.09"
+export VERSION="2026.01"
 export CONTAINER_NAME="ml_module_${VERSION}.sif"
 export PREFIX="$PWD"
-export SOFTWARE_SOURCE_DIRECTORY="/sw/sources"
+export SOFTWARE_SOURCE_DIRECTORY="/sw/rl9g"
 export MODULESHOME="/sw/rl9g/modulefiles/applications/machine_learning"
 export PACKAGE="machine_learning"
 export SRCDIR="${SOFTWARE_SOURCE_DIRECTORY}/${PACKAGE}"
 export SRC_REPO="https://github.com/D-Barradas/ibex-machine-learning-modules.git"
-export TARGET_DIR="${VERSION}/singularity"
+export TARGET_DIR="${SRCDIR}/${VERSION}/singularity"
 
 # Create the target directory
 mkdir -p "$TARGET_DIR"
