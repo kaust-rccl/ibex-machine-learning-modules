@@ -19,11 +19,14 @@ cat > "$MODULEFILE_PATH" <<EOF
 set name            machine_learning
 set version         $VERSION
 set container_path  $CONTAINER_PATH
+set stack           gpu
 
 if { [module-info mode load] } {
    puts stderr "Loading module for \$name \$version"
    puts stderr "Container: \$container_path"
    puts stderr "\$name \$version is now loaded"
+   #ELASTIC SEARCH SNIPET
+   set output [exec /usr/bin/python3 /sw/sources/elasticsearch/elasticapps.py --app "$name" --version "$version" --stack "$stack" &]
 }
 
 if { [module-info mode remove] } {
@@ -34,14 +37,14 @@ if { [module-info mode remove] } {
 # Set container environment variables
 setenv ML_CONTAINER_PATH $CONTAINER_PATH
 setenv SINGULARITY_IMAGE $CONTAINER_PATH
-setenv SINGULARITY_CACHEDIR /tmp/singularity-cache-\$USER
+# setenv SINGULARITY_CACHEDIR /tmp/singularity-cache-\$USER
 
 # Bind common paths for HPC cluster access
-setenv SINGULARITYENV_BIND "/sw,/home,/scratch,/project"
+# setenv SINGULARITYENV_BIND "/sw,/home,/scratch,/project"
 
 # Container-specific environment variables
-setenv SINGULARITYENV_LD_LIBRARY_PATH "/usr/local/lib:/usr/lib/x86_64-linux-gnu:\$LD_LIBRARY_PATH"
-setenv SINGULARITYENV_PATH "/opt/conda/envs/ml-module/bin:/opt/bin:\$PATH"
+# setenv SINGULARITYENV_LD_LIBRARY_PATH "/usr/local/lib:/usr/lib/x86_64-linux-gnu:\$LD_LIBRARY_PATH"
+# setenv SINGULARITYENV_PATH "/opt/conda/envs/ml-module/bin:/opt/bin:\$PATH"
 
 # GPU support (if using nvidia-container-runtime)
 setenv SINGULARITYENV_NVIDIA_VISIBLE_DEVICES all
