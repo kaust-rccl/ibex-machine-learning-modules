@@ -3,7 +3,6 @@ From: nvcr.io/nvidia/cuda-dl-base:25.11-cuda13.0-runtime-ubuntu24.04
 Stage: build
 
 %post
-    chmod 1777 /tmp
     # ============================================================
     # STAGE 1: BUILD - Install all dependencies and tools
     # ============================================================
@@ -19,25 +18,13 @@ Stage: build
     
     # Configure apt-get for HPC environment
     export DEBIAN_FRONTEND=noninteractive
-    export APT_CONFIG=/tmp/apt.conf
-    cat > $APT_CONFIG <<'APT_EOF'
-APT::ExtractTemplates::TempDir "/var/tmp";
-Dir::Cache::tmp "/var/tmp";
-APT::Cache-Start 251658240;
-APT::Acquire::Retries "10";
-APT::Acquire::https::Timeout "240";
-APT::Acquire::http::Timeout "240";
-APT::Get::AllowUnauthenticated "true";
-APT_EOF
     
     # Update system packages with GPG key bypass for HPC networks
-    apt-get update -o Apt::Get::AllowUnauthenticated=true -o APT::ExtractTemplates::TempDir=/var/tmp \
-        || apt-get update --allow-unauthenticated || true
+    apt-get update -y --allow-unauthenticated || apt-get update -y || true
     
     # Install system packages
     apt-get install -y --no-install-recommends \
-        -o Apt::Get::AllowUnauthenticated=true \
-        -o APT::ExtractTemplates::TempDir=/var/tmp \
+        --allow-unauthenticated \
         python3.12 \
         python3-pip \
         python3-dev \
@@ -135,10 +122,9 @@ EOF
     conda clean -a -y
     
     # Install additional system utilities for HPC
-    apt-get update -o Apt::Get::AllowUnauthenticated=true -o APT::ExtractTemplates::TempDir=/var/tmp || true
+    apt-get update -y --allow-unauthenticated || true
     apt-get install -y --no-install-recommends \
-        -o Apt::Get::AllowUnauthenticated=true \
-        -o APT::ExtractTemplates::TempDir=/var/tmp \
+        --allow-unauthenticated \
         libibverbs-dev \
         librdmacm-dev \
         && rm -rf /var/lib/apt/lists/*
@@ -215,29 +201,43 @@ except: pass
 " 2>/dev/null || true
 
 # Execute user command or start bash
-if [ \$# -eq 0 ]; then
+if [ $# -eq 0 ]; then
     echo "Starting interactive bash shell..."
     exec /bin/bash
 else
-    echo "Executing command: \$@"
-    exec "\$@"
+    echo "Executing command: $@"
+    exec "$@"
 fi
 ENTRYPOINT_EOF
     
     chmod +x /opt/bin/ml-entrypoint.sh
     
+    # Create bash profile that auto-activates conda environment
+    mkdir -p /etc/profile.d
+    cat > /etc/profile.d/conda-init.sh <<'CONDA_INIT_EOF'
+#!/bin/bash
+# Auto-activate conda environment on shell initialization
+if [ -z "$CONDA_DEFAULT_ENV" ] || [ "$CONDA_DEFAULT_ENV" = "base" ]; then
+    source /opt/conda/etc/profile.d/conda.sh 2>/dev/null
+    conda activate ml-module 2>/dev/null || true
+fi
+CONDA_INIT_EOF
+    chmod 644 /etc/profile.d/conda-init.sh
+    
     echo "Build stage completed successfully!"
 
 %environment
     # Environment variables for runtime
-    export PATH="/opt/conda/bin:/opt/bin:$PATH"
+    # Prioritize conda environment binaries in PATH
+    export PATH="/opt/conda/envs/ml-module/bin:/opt/conda/bin:/opt/bin:$PATH"
     export CONDA_DEFAULT_ENV=ml-module
     export CONDA_PREFIX=/opt/conda/envs/ml-module
     
     # CUDA environment variables
     export CUDA_HOME=/usr/local/cuda
     export CUDA_PATH=/usr/local/cuda
-    export LD_LIBRARY_PATH="/usr/local/cuda/lib64:/opt/conda/lib:$LD_LIBRARY_PATH"
+    # Prepend conda env libs to avoid host/libstdc++ ABI mismatches (needed for RAPIDS/pyarrow)
+    export LD_LIBRARY_PATH="/opt/conda/envs/ml-module/lib:/usr/local/cuda/lib64:/opt/conda/lib:$LD_LIBRARY_PATH"
     
     # RAPIDS environment
     export RAPIDS_NO_INITIALIZE=1
@@ -269,11 +269,15 @@ ENTRYPOINT_EOF
     export NVIDIA_DRIVER_CAPABILITIES=compute,utility
 
 %runscript
-    # Default run script - executes entrypoint
+    # Default run script - activate conda and execute entrypoint
+    source /opt/conda/etc/profile.d/conda.sh
+    conda activate ml-module
     exec /opt/bin/ml-entrypoint.sh "$@"
 
 %startscript
-    # For instance mode (if needed)
+    # For instance mode (if needed) - activate conda
+    source /opt/conda/etc/profile.d/conda.sh
+    conda activate ml-module
     exec /opt/bin/ml-entrypoint.sh "$@"
 
 %labels
