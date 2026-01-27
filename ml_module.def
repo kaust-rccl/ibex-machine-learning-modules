@@ -2,6 +2,10 @@ Bootstrap: docker
 From: nvcr.io/nvidia/cuda-dl-base:25.11-cuda13.0-runtime-ubuntu24.04
 Stage: build
 
+%files
+    # Copy environment.yml from host to container before %post runs
+    environment.yml /opt/environment.yml
+
 %post
     # ============================================================
     # STAGE 1: BUILD - Install all dependencies and tools
@@ -52,73 +56,18 @@ Stage: build
     bash /tmp/mambaforge.sh -b -p $CONDA_DIR
     rm /tmp/mambaforge.sh
     
-    # Copy environment file (assumes it's in the build context)
-    # Note: For Singularity, you'll need to have environment.yml in the same directory
-    # or modify the path below to match your setup
-    if [ -f environment.yml ]; then
-        cp environment.yml /tmp/environment.yml
-    else
-        echo "Warning: environment.yml not found in build context"
-        echo "Creating minimal environment.yml..."
-        cat > /tmp/environment.yml <<'EOF'
-name: ml-module
-channels:
-  - pytorch
-  - nvidia
-  - rapidsai
-  - conda-forge
-  - defaults
-dependencies:
-  - python=3.12
-  - 'cuda-version==13.0'
-  - 'pytorch=*=*cuda*'
-  - pytorch-cuda
-  - torchvision
-  - torchaudio
-  - pytorch-lightning
-  - dask
-  - dask-ml
-  - ray-default
-  - lightgbm
-  - catboost
-  - xgboost
-  - scikit-learn
-  - pandas
-  - polars
-  - numpy
-  - scipy
-  - jupyterlab
-  - jupyter
-  - ipykernel
-  - ipywidgets
-  - matplotlib
-  - seaborn
-  - plotly
-  - streamlit
-  - mlflow
-  - wandb
-  - optuna
-  - transformers
-  - datasets
-  - pip
-  - pip:
-    - --extra-index-url https://pypi.nvidia.com
-    - cudf-cu13==25.12.*
-    - dask-cudf-cu13==25.12.*
-    - cuml-cu13==25.12.*
-    - cugraph-cu13==25.12.*
-    - nx-cugraph-cu13==25.12.*
-    - jax[cuda13]
-    - tensorflow[and-cuda]
-    - jupyter-ai
-    - accelerate
-    - nvidia-ml-py
-EOF
+    # Verify environment.yml was copied via %files section
+    if [ ! -f /opt/environment.yml ]; then
+        echo "ERROR: environment.yml not found at /opt/environment.yml"
+        echo "Build failed - environment.yml must be in the same directory as ml_module.def"
+        exit 1
     fi
+    
+    echo "Found environment.yml, proceeding with package installation..."
     
     # Install packages using mamba
     echo "Installing packages from environment.yml..."
-    mamba env create -f /tmp/environment.yml
+    mamba env create -f /opt/environment.yml
     conda clean -a -y
     
     # Install additional system utilities for HPC
@@ -253,7 +202,8 @@ CONDA_INIT_EOF
     
     # Jupyter configuration
     export JUPYTER_ENABLE_LAB=yes
-    export JUPYTER_CONFIG_DIR=/etc/jupyter
+    # Note: JUPYTER_CONFIG_DIR should be set by launch scripts to writable user directory
+    # Do not set here to avoid read-only filesystem errors
     
     # Python optimization
     export PYTHONUNBUFFERED=1
