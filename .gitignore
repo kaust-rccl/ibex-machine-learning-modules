@@ -138,3 +138,7 @@ dcgm/
 # ignore scan reports
 scan-reports/
 scan-reports-option4/
+**.out
+**.err
+**.log
+**.sif
