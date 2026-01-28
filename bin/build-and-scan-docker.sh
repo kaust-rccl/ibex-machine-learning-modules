@@ -6,13 +6,14 @@
 set -euo pipefail
 
 # Configuration
-IMAGE_TAG="${1:-ml-module:latest}"
+IMAGE_TAG="${1:-dxbarradas/ml-module:latest}"
 DOCKERFILE="${2:-Dockerfile}"
 CONTEXT="${3:-.}"
 REPORT_DIR="${4:-scan-reports}"
 SEVERITIES="${5:-CRITICAL,HIGH,MEDIUM}"
+TIMEOUT="${6:-30m}"
 
-TRIVY_OPTS="--scanners vuln,config,secret --ignore-unfixed"
+TRIVY_OPTS="--scanners vuln,misconfig --ignore-unfixed --timeout ${TIMEOUT}"
 TRIVY_FORMAT_JSON="json"
 TRIVY_FORMAT_TABLE="table"
 
@@ -27,13 +28,13 @@ if [ ! -f "$DOCKERFILE" ]; then
     exit 1
 fi
 
-if [ ! -f "requirements.txt" ]; then
-    echo "❌ requirements.txt not found"
+if [ ! -f "environment.yml" ]; then
+    echo "❌ environment.yml not found"
     exit 1
 fi
 
 echo "╔════════════════════════════════════════════════════════════╗"
-echo "║  ML Module Container Build & Scan - Option 4               ║"
+echo "║  ML Module Container Build & Scan                          ║"
 echo "╚════════════════════════════════════════════════════════════╝"
 echo ""
 echo "Configuration:"
@@ -41,6 +42,7 @@ echo "  Image tag: $IMAGE_TAG"
 echo "  Dockerfile: $DOCKERFILE"
 echo "  Context: $CONTEXT"
 echo "  Report dir: $REPORT_DIR"
+echo "  Timeout: $TIMEOUT"
 echo ""
 
 # ========================================================================
@@ -78,10 +80,31 @@ fi
 echo ""
 
 # ========================================================================
+# Step 1.5: Extract Environment Lockfile
+# ========================================================================
+echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+echo "[1.5/5] Extracting environment lockfile from container"
+echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+
+docker run --rm --platform=linux/amd64 "$IMAGE_TAG" cat /opt/environment_lockfile.yml > environment_exported.yml
+
+if [ $? -eq 0 ] && [ -f "environment_exported.yml" ]; then
+    EXPORT_SIZE=$(wc -l < environment_exported.yml)
+    echo "✅ Environment lockfile extracted"
+    echo "   File: environment_exported.yml"
+    echo "   Lines: $EXPORT_SIZE"
+    echo "   Ready to commit to repo for version tracking"
+else
+    echo "⚠️  Warning: Could not extract environment lockfile"
+fi
+
+echo ""
+
+# ========================================================================
 # Step 2: Trivy Image Scan (JSON)
 # ========================================================================
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
-echo "[2/4] Scanning image with Trivy (JSON report)"
+echo "[2/5] Scanning image with Trivy (JSON report)"
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
 
 trivy image \
@@ -103,7 +126,7 @@ echo ""
 # Step 3: Trivy Image Scan (Table Output)
 # ========================================================================
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
-echo "[3/4] Trivy Vulnerability Summary (table)"
+echo "[3/5] Trivy Vulnerability Summary (table)"
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
 
 trivy image \
@@ -118,7 +141,7 @@ echo ""
 # Step 4: Trivy Filesystem Scan (build context)
 # ========================================================================
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
-echo "[4/4] Scanning build context with Trivy"
+echo "[4/5] Scanning build context with Trivy"
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
 
 trivy fs \
@@ -150,7 +173,8 @@ echo "  Reports: $REPORT_DIR/"
 echo ""
 echo "Next steps:"
 echo "  1. Review Trivy reports: ls -lh $REPORT_DIR/"
-echo "  2. Test image: docker run --rm --gpus all $IMAGE_TAG python --version"
-echo "  3. Convert to Singularity: docker run -v /var/run/docker.sock:/var/run/docker.sock \\"
+echo "  2. Commit environment lockfile: git add environment_exported.yml && git commit -m 'Update environment lockfile'"
+echo "  3. Test image: docker run --rm --gpus all $IMAGE_TAG python --version"
+echo "  4. Convert to Singularity: docker run -v /var/run/docker.sock:/var/run/docker.sock \\"
 echo "       singularityware/singularity build ml_module.sif docker-daemon://$IMAGE_TAG"
 echo ""
