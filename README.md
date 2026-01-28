@@ -11,7 +11,7 @@ Singularity container with RAPIDS, PyTorch, TensorFlow, JAX, and 100+ ML librari
 ### For Users
 ```bash
 # Load the module
-module load machine_learning/2025.09/singularity
+module load machine_learning/2026.01/singularity
 
 # Run Python script
 singularity exec $ML_CONTAINER_PATH python train.py
@@ -20,7 +20,7 @@ singularity exec $ML_CONTAINER_PATH python train.py
 singularity shell --nv $ML_CONTAINER_PATH
 
 # Jupyter Lab
-sbatch bin/launch-jupyter-server.sbatch
+sbatch bin/launch-jupyter-container-ml-module-26.01.sbatch
 ```
 
 ### For Administrators
@@ -83,7 +83,7 @@ bash bin/setup_install.sh
 ### Deployment Model
 ```
 HPC Cluster (RockyLinux 9 + SLURM)
-├── Singularity Container: ml_module_2025.09.sif
+├── Singularity Container: ml_module_2026.01.sif
 │   ├── Base: NVIDIA CUDA-DL-Base (CUDA 13.0, Ubuntu 24.04)
 │   ├── Python: 3.12
 │   ├── Build: Mambaforge + environment.yml
@@ -92,7 +92,7 @@ HPC Cluster (RockyLinux 9 + SLURM)
 ├── Environment Module: /sw/rl9g/modulefiles/applications/machine_learning/
 │   └── Sets: $ML_CONTAINER_PATH, $SINGULARITY_IMAGE
 │
-└── User Access: module load machine_learning/2025.09/singularity
+└── User Access: module load machine_learning/2026.01/singularity
 ```
 
 ### Key Features
@@ -145,11 +145,12 @@ bash bin/build-and-scan-docker.sh
 
 **Singularity (for HPC deployment):**
 ```bash
-# Build on HPC cluster with sudo
-sudo singularity build ml_module.sif ml_module.def
+# Build on HPC cluster without sudo
+# The HPC cluster must have Singularity installed
+singularity build ml_module.sif ml_module.def
 
 # Build time: 30-60 minutes
-# Output: ml_module.sif (~6-7 GB)
+# Output: ml_module.sif (~6-7 GB) If build locally with singularity_build_local_container.slurm
 ```
 
 ### Installation Scripts
