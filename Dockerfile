@@ -26,7 +26,6 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     && rm -rf /var/lib/apt/lists/*
 
 
-
 # install mambaforge (includes mamba and conda in one)
 ENV CONDA_DIR=/opt/conda \
     PATH=/opt/conda/bin:$PATH \
@@ -40,23 +39,18 @@ RUN wget -q --show-progress https://github.com/conda-forge/miniforge/releases/do
 RUN update-alternatives --install /usr/bin/python python /usr/bin/python3.12 1 && \
     update-alternatives --install /usr/bin/python3 python3 /usr/bin/python3.12 1
 
-# Upgrade pip, setuptools, wheel
-# RUN python -m pip install --upgrade pip setuptools wheel
-
-# Copy requirements
-# COPY requirements.txt /tmp/requirements.txt
+# Copy environment
 COPY environment.yml /tmp/environment.yml
 
-# Install Python packages from pip (wheels - fast and clean)
-# Note: Using cu118 for PyTorch as cu131 wheels may not be available
-# RUN python -m pip install --no-cache-dir --upgrade \
-#     torch==2.5.1 --index-url https://download.pytorch.org/whl/cu118 && \
-#     python -m pip install --no-cache-dir --upgrade \
-#     -r /tmp/requirements.txt
-
 # Install Python packages from conda (for complex dependencies)
+# Export pinned versions for security scanning and reproducibility
 RUN mamba env create -f /tmp/environment.yml && \
+    conda env export -n ml-module --no-builds > /tmp/environment_exported.yml && \
+    echo "✅ Environment exported with pinned versions for Trivy scanning" && \
     conda clean -a -y
+
+# Make the exported file the "official" one for Trivy
+RUN cp /tmp/environment_exported.yml /opt/environment_lockfile.yml
 
 # Create Jupyter config directory
 RUN mkdir -p /etc/jupyter && \
@@ -151,18 +145,23 @@ RUN update-alternatives --install /usr/bin/python python /usr/bin/python3.12 1 &
     update-alternatives --install /usr/bin/python3 python3 /usr/bin/python3.12 1
 
 # Copy installed packages from builder
+COPY --from=builder /opt/conda /opt/conda
+COPY --from=builder /tmp/environment_exported.yml /tmp/environment_exported.yml
+COPY --from=builder /opt/environment_lockfile.yml /opt/environment_lockfile.yml
 COPY --from=builder /usr/local/lib/python3.12/dist-packages /usr/local/lib/python3.12/dist-packages
 COPY --from=builder /usr/local/bin /usr/local/bin
 COPY --from=builder /etc/jupyter /etc/jupyter
 COPY --from=builder /opt/bin/ml-entrypoint.sh /opt/bin/ml-entrypoint.sh
 
 # Set environment variables
-ENV PATH=/opt/bin:$PATH \
+ENV PATH=/opt/conda/bin:/opt/conda/envs/ml-module/bin:/opt/bin:$PATH \
+    CONDA_PREFIX=/opt/conda/envs/ml-module \
+    CONDA_DEFAULT_ENV=ml-module \
     PYTHONUNBUFFERED=1 \
     PYTHONDONTWRITEBYTECODE=1 \
     CUDA_HOME=/usr/local/cuda \
     CUDA_PATH=/usr/local/cuda \
-    LD_LIBRARY_PATH=/usr/local/cuda/lib64:/usr/local/cuda/extras/CUPTI/lib64
+    LD_LIBRARY_PATH=/opt/conda/envs/ml-module/lib:/usr/local/cuda/lib64:/usr/local/cuda/extras/CUPTI/lib64:$LD_LIBRARY_PATH
 
 # HPC-specific environment variables
 ENV NVIDIA_VISIBLE_DEVICES=all \
@@ -185,7 +184,7 @@ CMD ["/bin/bash"]
 
 # Labels and metadata
 LABEL maintainer="didier.barradasbautista@kaust.edu.sa" \
-      version="2.0-option4" \
+      version="2026.01" \
       description="ML Module Container - CUDA 13.0 + conda/mamba packages" \
       base="nvcr.io/nvidia/cuda-dl-base:25.11-cuda13.0-runtime-ubuntu24.04" \
       python="3.12" \

@@ -10,13 +10,13 @@ dependencies:
   - python=3.12
   - 'cuda-version==13.0'
   
-  # Deep Learning Frameworks
-  - 'pytorch=*=*cuda*'
-  - 'pytorch-mutex=*=cuda*'
-  - pytorch-cuda
-  - torchvision
-  - torchaudio
-  - pytorch-lightning
+  # Deep Learning Frameworks (conda installs commented out to use pip versions for CUDA 13)
+  # - 'pytorch=*=*cuda*'
+  # - 'pytorch-mutex=*=cuda*'
+  # - pytorch-cuda
+  # - torchvision
+  # - torchaudio
+  # - pytorch-lightning
   # - 'tensorflow=*=*cuda*'
   # - jax
   # - 'jaxlib=*=*cuda*'
@@ -134,6 +134,11 @@ dependencies:
     - pylibraft-cu13==25.12.*
     - raft-dask-cu13==25.12.*
     - cuvs-cu13==25.12.*
+    # pytorch packages via pip (CUDA 13)
+    - --extra-index-url https://download.pytorch.org/whl/cu130
+    - torch==2.10.0 
+    - torchvision==0.25.0 
+    - torchaudio==2.10.0
     # Other pip packages
     - jupyter-ai
     - evaluate
