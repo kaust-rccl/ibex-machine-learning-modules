@@ -51,6 +51,7 @@ echo ""
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
 echo "[1/4] Building Docker image: $IMAGE_TAG"
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+TIMESTAMP=$(date +%Y%m%d_%H%M%S)
 
 BUILD_START=$(date +%s)
 
@@ -111,13 +112,13 @@ trivy image \
     $TRIVY_OPTS \
     --severity "$SEVERITIES" \
     --format "$TRIVY_FORMAT_JSON" \
-    --output "$REPORT_DIR/trivy-image.json" \
+    --output "$REPORT_DIR/trivy-image-${TIMESTAMP}.json" \
     "$IMAGE_TAG"
 
 if [ $? -eq 0 ]; then
     echo "✅ Image scan complete"
     VULN_COUNT=$(jq '.Results[0].Misconfigurations | length // 0' "$REPORT_DIR/trivy-image.json" 2>/dev/null || echo "0")
-    echo "   Report: $REPORT_DIR/trivy-image.json"
+    echo "   Report: $REPORT_DIR/trivy-image-${TIMESTAMP}.json"
 fi
 
 echo ""
@@ -148,12 +149,12 @@ trivy fs \
     $TRIVY_OPTS \
     --severity "$SEVERITIES" \
     --format "$TRIVY_FORMAT_JSON" \
-    --output "$REPORT_DIR/trivy-fs.json" \
+    --output "$REPORT_DIR/trivy-fs-${TIMESTAMP}.json" \
     "$CONTEXT"
 
 if [ $? -eq 0 ]; then
     echo "✅ Filesystem scan complete"
-    echo "   Report: $REPORT_DIR/trivy-fs.json"
+    echo "   Report: $REPORT_DIR/trivy-fs-${TIMESTAMP}.json"
 fi
 
 echo ""
@@ -169,7 +170,7 @@ echo "Summary:"
 echo "  Image: $IMAGE_TAG"
 echo "  Size: $IMAGE_SIZE"
 echo "  Build time: ${BUILD_DURATION}s"
-echo "  Reports: $REPORT_DIR/"
+echo "  Reports: $REPORT_DIR/trivy-image-${TIMESTAMP}.json, $REPORT_DIR/trivy-fs-${TIMESTAMP}.json"
 echo ""
 echo "Next steps:"
 echo "  1. Review Trivy reports: ls -lh $REPORT_DIR/"
