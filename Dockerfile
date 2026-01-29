@@ -7,7 +7,8 @@
 # Stage 1: Builder - Install all packages
 # ============================================================================
 # FROM nvcr.io/nvidia/cuda-dl-base:25.11-cuda13.0-runtime-ubuntu24.04 AS builder
-FROM nvcr.io/nvidia/cuda-dl-base:25.11-cuda13.0-runtime-ubuntu24.04 AS builder
+# V100 does not support CUDA 13 so we use a more compatible base image
+FROM nvcr.io/nvidia/cuda-dl-base:25.03-cuda12.8-runtime-ubuntu24.04 AS builder
 
 ENV DEBIAN_FRONTEND=noninteractive
 
@@ -127,7 +128,8 @@ RUN chmod +x /opt/bin/ml-entrypoint.sh
 # ============================================================================
 # Stage 2: Runtime - Minimal image with only runtime dependencies
 # ============================================================================
-FROM nvcr.io/nvidia/cuda-dl-base:25.11-cuda13.0-runtime-ubuntu24.04
+# FROM nvcr.io/nvidia/cuda-dl-base:25.11-cuda13.0-runtime-ubuntu24.04
+FROM nvcr.io/nvidia/cuda-dl-base:25.03-cuda12.8-runtime-ubuntu24.04
 
 ENV DEBIAN_FRONTEND=noninteractive
 

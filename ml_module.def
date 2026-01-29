@@ -1,5 +1,7 @@
 Bootstrap: docker
-From: nvcr.io/nvidia/cuda-dl-base:25.11-cuda13.0-runtime-ubuntu24.04
+#From: nvcr.io/nvidia/cuda-dl-base:25.11-cuda13.0-runtime-ubuntu24.04
+From: nvcr.io/nvidia/cuda-dl-base:25.03-cuda12.8-runtime-ubuntu24.04 AS builder
+
 Stage: build
 
 %files
@@ -234,11 +236,11 @@ CONDA_INIT_EOF
     Author didier.barradasbautista@kaust.edu.sa
     Version 2.0
     Description "ML module for HPC clusters - RAPIDS 25.12, PyTorch, TensorFlow, JAX via conda/mamba"
-    Base nvcr.io/nvidia/cuda-dl-base:25.11-cuda13.0-runtime-ubuntu24.04
-    CUDA 13.0
+    Base nvcr.io/nvidia/cuda-dl-base:25.03-cuda12.8-runtime-ubuntu24.04
+    CUDA 12.8
     Python 3.12
     OS_Compatibility RockyLinux 9, Ubuntu 24.04
-    Build_Date 2026-01-20
+    Build_Date 2026-01-29
 
 %help
     ==============================================================================
