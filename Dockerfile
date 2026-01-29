@@ -187,7 +187,7 @@ CMD ["/bin/bash"]
 # Labels and metadata
 LABEL maintainer="didier.barradasbautista@kaust.edu.sa" \
       version="2026.01" \
-      description="ML Module Container - CUDA 13.0 + conda/mamba packages" \
-      base="nvcr.io/nvidia/cuda-dl-base:25.11-cuda13.0-runtime-ubuntu24.04" \
+      description="ML Module Container - CUDA 12.8 + conda/mamba packages" \
+      base="nvcr.io/nvidia/cuda-dl-base:25.03-cuda12.8-runtime-ubuntu24.04" \
       python="3.12" \
       frameworks="PyTorch , TensorFlow , JAX , RAPIDS"
