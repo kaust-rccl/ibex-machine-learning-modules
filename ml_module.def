@@ -1,6 +1,5 @@
 Bootstrap: docker
-#From: nvcr.io/nvidia/cuda-dl-base:25.11-cuda13.0-runtime-ubuntu24.04
-From: nvcr.io/nvidia/cuda-dl-base:25.03-cuda12.8-runtime-ubuntu24.04 AS builder
+From: nvcr.io/nvidia/cuda-dl-base:25.03-cuda12.8-runtime-ubuntu24.04
 
 Stage: build
 
