@@ -1,0 +1,299 @@
+Bootstrap: docker
+From: nvcr.io/nvidia/cuda-dl-base:25.03-cuda12.8-runtime-ubuntu24.04
+
+Stage: build
+
+%files
+    # Copy environment.yml from host to container before %post runs
+    environment.yml /opt/environment.yml
+
+%post
+    # ============================================================
+    # STAGE 1: BUILD - Install all dependencies and tools
+    # ============================================================
+    
+    echo "Starting build stage..."
+    
+    # Setup temporary directory to avoid /tmp permission issues on HPC
+    chmod 1777 /tmp
+    export TMPDIR=/var/tmp
+    export TEMP=/var/tmp
+    export TMP=/var/tmp
+    mkdir -p /var/tmp
+    
+    # Configure apt-get for HPC environment
+    export DEBIAN_FRONTEND=noninteractive
+    
+    # Update system packages with GPG key bypass for HPC networks
+    apt-get update -y --allow-unauthenticated || apt-get update -y || true
+    
+    # Install system packages
+    apt-get install -y --no-install-recommends \
+        --allow-unauthenticated \
+        python3.12 \
+        python3-pip \
+        python3-dev \
+        build-essential \
+        curl \
+        wget \
+        git \
+        vim \
+        ca-certificates \
+        libssl-dev \
+        libffi-dev \
+        libgomp1 \
+        && rm -rf /var/lib/apt/lists/*
+    
+    # Set python3.12 as default
+    update-alternatives --install /usr/bin/python python /usr/bin/python3.12 1
+    update-alternatives --install /usr/bin/python3 python3 /usr/bin/python3.12 1
+    
+    # Install Mambaforge (includes mamba and conda)
+    export CONDA_DIR=/opt/conda
+    export PATH="/opt/conda/bin:$PATH"
+    export CONDA_ALWAYS_YES=true
+    
+    wget -q --show-progress https://github.com/conda-forge/miniforge/releases/download/24.1.2-0/Mambaforge-Linux-x86_64.sh -O /tmp/mambaforge.sh
+    bash /tmp/mambaforge.sh -b -p $CONDA_DIR
+    rm /tmp/mambaforge.sh
+    
+    # Verify environment.yml was copied via %files section
+    if [ ! -f /opt/environment.yml ]; then
+        echo "ERROR: environment.yml not found at /opt/environment.yml"
+        echo "Build failed - environment.yml must be in the same directory as ml_module.def"
+        exit 1
+    fi
+    
+    echo "Found environment.yml, proceeding with package installation..."
+    
+    # Install packages using mamba
+    echo "Installing packages from environment.yml..."
+    mamba env create -f /opt/environment.yml
+    conda clean -a -y
+    
+    # Install additional system utilities for HPC
+    apt-get update -y --allow-unauthenticated || true
+    apt-get install -y --no-install-recommends \
+        --allow-unauthenticated \
+        libibverbs-dev \
+        librdmacm-dev \
+        && rm -rf /var/lib/apt/lists/*
+    
+    # Configure Jupyter for remote access
+    mkdir -p /etc/jupyter
+    cat > /etc/jupyter/jupyter_notebook_config.py <<'JUPYTER_EOF'
+from os import getenv
+c.ServerApp.ip = '0.0.0.0'
+c.ServerApp.port = int(getenv('JUPYTER_PORT', '8888'))
+c.ServerApp.open_browser = False
+c.ServerApp.allow_root = True
+c.ServerApp.root_dir = '/work'
+c.ServerApp.allow_origin = '*'
+c.ServerApp.disable_check_xsrf = True
+JUPYTER_EOF
+    
+    # Set up entrypoint script for SLURM integration
+    mkdir -p /opt/bin
+    cat > /opt/bin/ml-entrypoint.sh <<'ENTRYPOINT_EOF'
+#!/bin/bash
+set -e
+
+echo "=== ML Module Container Entrypoint ==="
+echo "Hostname: $(hostname)"
+echo "Date: $(date)"
+
+# SLURM environment detection
+if [ -n "$SLURM_JOB_ID" ]; then
+    echo "Running in SLURM job: $SLURM_JOB_ID"
+    echo "Partition: $SLURM_JOB_PARTITION"
+    echo "Nodes: $SLURM_JOB_NUM_NODES"
+    echo "CPUs per task: $SLURM_CPUS_PER_TASK"
+    export WORKDIR="${SLURM_SUBMIT_DIR:-/work}"
+    export TMPDIR="${SLURM_TMPDIR:-/tmp}"
+else
+    echo "Running outside SLURM"
+    export WORKDIR="${WORKDIR:-/work}"
+fi
+
+# GPU detection and reporting
+if command -v nvidia-smi >/dev/null 2>&1; then
+    echo "GPUs detected:"
+    nvidia-smi --query-gpu=index,name,driver_version,memory.total --format=csv,noheader
+else
+    echo "No GPUs detected"
+fi
+
+# Activate conda environment
+source /opt/conda/etc/profile.d/conda.sh
+conda activate ml-module
+
+# Framework versions
+python -c "
+import sys
+print(f'Python: {sys.version.split()[0]}')
+try:
+    import torch
+    print(f'PyTorch: {torch.__version__} (CUDA available: {torch.cuda.is_available()})')
+except: pass
+try:
+    import tensorflow as tf
+    gpus = tf.config.list_physical_devices('GPU')
+    print(f'TensorFlow: {tf.__version__} (GPUs: {len(gpus)})')
+except: pass
+try:
+    import jax
+    print(f'JAX: {jax.__version__}')
+except: pass
+try:
+    import cudf
+    print(f'RAPIDS cuDF: {cudf.__version__}')
+except: pass
+" 2>/dev/null || true
+
+# Execute user command or start bash
+if [ $# -eq 0 ]; then
+    echo "Starting interactive bash shell..."
+    exec /bin/bash
+else
+    echo "Executing command: $@"
+    exec "$@"
+fi
+ENTRYPOINT_EOF
+    
+    chmod +x /opt/bin/ml-entrypoint.sh
+    
+    # Create bash profile that auto-activates conda environment
+    mkdir -p /etc/profile.d
+    cat > /etc/profile.d/conda-init.sh <<'CONDA_INIT_EOF'
+#!/bin/bash
+# Auto-activate conda environment on shell initialization
+if [ -z "$CONDA_DEFAULT_ENV" ] || [ "$CONDA_DEFAULT_ENV" = "base" ]; then
+    source /opt/conda/etc/profile.d/conda.sh 2>/dev/null
+    conda activate ml-module 2>/dev/null || true
+fi
+CONDA_INIT_EOF
+    chmod 644 /etc/profile.d/conda-init.sh
+    
+    echo "Build stage completed successfully!"
+
+%environment
+    # Environment variables for runtime
+    # Prioritize conda environment binaries in PATH
+    export PATH="/opt/conda/envs/ml-module/bin:/opt/conda/bin:/opt/bin:$PATH"
+    export CONDA_DEFAULT_ENV=ml-module
+    export CONDA_PREFIX=/opt/conda/envs/ml-module
+    
+    # CUDA environment variables
+    export CUDA_HOME=/usr/local/cuda
+    export CUDA_PATH=/usr/local/cuda
+    # Prepend conda env libs to avoid host/libstdc++ ABI mismatches (needed for RAPIDS/pyarrow)
+    export LD_LIBRARY_PATH="/opt/conda/envs/ml-module/lib:/usr/local/cuda/lib64:/opt/conda/lib:$LD_LIBRARY_PATH"
+    
+    # RAPIDS environment
+    export RAPIDS_NO_INITIALIZE=1
+    export CUDF_SPILL=1
+    
+    # Dask configuration for HPC
+    export DASK_DISTRIBUTED__COMM__TIMEOUTS__CONNECT=60s
+    export DASK_DISTRIBUTED__COMM__TIMEOUTS__TCP=60s
+    
+    # Ray configuration
+    export RAY_ADDRESS=""
+    export RAY_BACKEND_LOG_LEVEL=warning
+    
+    # Jupyter configuration
+    export JUPYTER_ENABLE_LAB=yes
+    # Note: JUPYTER_CONFIG_DIR should be set by launch scripts to writable user directory
+    # Do not set here to avoid read-only filesystem errors
+    
+    # Python optimization
+    export PYTHONUNBUFFERED=1
+    export PYTHONDONTWRITEBYTECODE=1
+    
+    # HPC-friendly settings
+    export OMP_NUM_THREADS=1
+    export MKL_NUM_THREADS=1
+    export NUMEXPR_NUM_THREADS=1
+    
+    # NVIDIA GPU
+    export NVIDIA_VISIBLE_DEVICES=all
+    export NVIDIA_DRIVER_CAPABILITIES=compute,utility
+
+%runscript
+    # Default run script - activate conda and execute entrypoint
+    source /opt/conda/etc/profile.d/conda.sh
+    conda activate ml-module
+    exec /opt/bin/ml-entrypoint.sh "$@"
+
+%startscript
+    # For instance mode (if needed) - activate conda
+    source /opt/conda/etc/profile.d/conda.sh
+    conda activate ml-module
+    exec /opt/bin/ml-entrypoint.sh "$@"
+
+%labels
+    Author didier.barradasbautista@kaust.edu.sa
+    Version 2.0
+    Description "ML module for HPC clusters - RAPIDS 25.12, PyTorch, TensorFlow, JAX via conda/mamba"
+    Base nvcr.io/nvidia/cuda-dl-base:25.03-cuda12.8-runtime-ubuntu24.04
+    CUDA 12.8
+    Python 3.12
+    OS_Compatibility RockyLinux 9, Ubuntu 24.04
+    Build_Date 2026-01-29
+
+%help
+    ==============================================================================
+    ML Module Container - All-in-One Machine Learning Environment for HPC
+    ==============================================================================
+    
+    This container provides a comprehensive machine learning environment optimized
+    for HPC clusters running RockyLinux 9 with SLURM job scheduler.
+    
+    INCLUDED FRAMEWORKS:
+    - RAPIDS 25.12 (cuDF, cuML, cuGraph) via pip wheels
+    - PyTorch with CUDA 13.0 support
+    - TensorFlow with CUDA support
+    - JAX with CUDA 13.0 support
+    - Ray (distributed computing with Tune & Train)
+    - Dask (distributed dataframes)
+    - LightGBM, CatBoost, XGBoost
+    - Transformers (HuggingFace)
+    - MLflow (experiment tracking)
+    - Optuna (hyperparameter optimization)
+    
+    DEVELOPMENT TOOLS:
+    - JupyterLab with extensions
+    - Code Server (VS Code in browser)
+    - Streamlit
+    - Dash & Plotly
+    
+    USAGE EXAMPLES:
+    
+    1. Interactive shell:
+       singularity shell --nv ml_module.sif
+    
+    2. Run Python script:
+       singularity exec --nv ml_module.sif python your_script.py
+    
+    3. Start Jupyter Lab:
+       singularity exec --nv ml_module.sif jupyter lab --ip=0.0.0.0 --port=8888
+    
+    4. SLURM batch job:
+       #!/bin/bash
+       #SBATCH --gpus-per-node=v100:1
+       #SBATCH --mem=32G
+       singularity exec --nv ml_module.sif python train_model.py
+    
+    5. With bind mounts:
+       singularity exec --nv \
+         --bind /ibex/user/$USER:/work \
+         --bind $SLURM_TMPDIR:/tmp \
+         ml_module.sif python script.py
+    
+    ENVIRONMENT VARIABLES:
+    - WORKDIR: Working directory (default: /work)
+    - JUPYTER_PORT: Jupyter port (default: 8888)
+    - CUDA_VISIBLE_DEVICES: GPU selection
+    
+    For support: contact ibex@hpc.kaust.edu.sa
+    ==============================================================================
