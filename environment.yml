@@ -10,7 +10,7 @@ dependencies:
   - python=3.12
   - 'cuda-version>=12.2,<=12.9'
   
-  # Deep Learning Frameworks (conda installs commented out to use pip versions for CUDA 13)
+  # Deep Learning Frameworks (all these frameworks prefer pip instead of conda for CUDA 12)
   # - 'pytorch=*=*cuda*'
   # - 'pytorch-mutex=*=cuda*'
   # - pytorch-cuda
@@ -124,16 +124,16 @@ dependencies:
   - pip:
     # RAPIDS packages via pip (CUDA 12)
     - --extra-index-url https://pypi.nvidia.com
-    - cudf-cu12==25.12.*
-    - dask-cudf-cu12==25.12.*
-    - cuml-cu12==25.12.*
-    - cugraph-cu12==25.12.*
-    - nx-cugraph-cu12==25.12.*
-    - cuxfilter-cu12==25.12.*
-    - cucim-cu12==25.12.*
-    - pylibraft-cu12==25.12.*
-    - raft-dask-cu12==25.12.*
-    - cuvs-cu12==25.12.*
+    - cudf-cu12==26.02.*
+    - dask-cudf-cu12==26.02.*
+    - cuml-cu12==26.02.*
+    - cugraph-cu12==26.02.*
+    - nx-cugraph-cu12==26.02.*
+    - cuxfilter-cu12==26.02.*
+    - cucim-cu12==26.02.*
+    - pylibraft-cu12==26.02.*
+    - raft-dask-cu12==26.02.*
+    - cuvs-cu12==26.02.*
     # pytorch packages via pip (CUDA 12.8)
     - --extra-index-url https://download.pytorch.org/whl/cu128
     - torch==2.10.0 
