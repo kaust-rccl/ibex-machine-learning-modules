@@ -75,6 +75,21 @@ if bash "${PREFIX}/bin/run_install_conda_install.sh"; then
     echo "Running quick verification..."
     bash "${PREFIX}/bin/verify_install_conda_install.sh" "${ENV_PREFIX}" || true
     
+    # Optional: Generate modulefile
+    if [[ "${GENERATE_MODULEFILE:-0}" == "1" ]]; then
+        echo ""
+        echo "Generating modulefile..."
+        export MODULESHOME="${MODULESHOME:-.modulefiles}"
+        export VERSION="${VERSION:-2026.01}"
+        export PACKAGE="${PACKAGE:-machine_learning}"
+        
+        if bash "${PREFIX}/bin/generate_modulefile_conda_install.sh"; then
+            echo "✓ Modulefile generated"
+        else
+            echo "⚠ Modulefile generation failed (non-critical)"
+        fi
+    fi
+    
     exit 0
 else
     echo ""

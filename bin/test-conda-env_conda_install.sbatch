@@ -20,6 +20,11 @@
 #   --gpus-per-node: Change GPU requirements
 #   --partition: Change to your preferred partition
 #
+# To generate a modulefile after successful tests:
+#   export MODULESHOME=/path/to/modulefiles
+#   export VERSION=2026.01
+#   bash bin/generate_modulefile_conda_install.sh
+#
 # Usage: sbatch bin/test-conda-env_conda_install.sbatch
 
 set -euo pipefail
