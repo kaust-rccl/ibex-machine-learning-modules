@@ -48,11 +48,28 @@ else
 fi
 
 # Set up environment variables for installation script
-export PREFIX="${SLURM_SUBMIT_DIR}"
-export ENV_PREFIX="${PREFIX}/env"
+
+export SOFTWARE_SOURCE_DIRECTORY="/sw/rl9g"
+export MODULESHOME="/sw/rl9g/modulefiles/applications/machine_learning"
+export PACKAGE="machine_learning"
+export SRCDIR="${SOFTWARE_SOURCE_DIRECTORY}/${PACKAGE}"
+
+export PREFIX="${SRCDIR}/${VERSION}"
+export ENV_FOLDER_SUFFIX="rl9_cuda12.9_py3.12_env"
+export ENV_PREFIX="${PREFIX}/${ENV_FOLDER_SUFFIX}"
+export PACKAGE="${PACKAGE:-machine_learning}"
+export VERSION="${VERSION:-2026.02}"
+export SRC_REPO="${SRC_REPO:-https://github.com/D-Barradas/ibex-machine-learning-modules.git}"
+
+
+
+
 
 echo "[INFO] Project directory: ${PREFIX}"
 echo "[INFO] Environment path: ${ENV_PREFIX}"
+echo "[INFO] Package name: ${PACKAGE}"
+echo "[INFO] Version: ${VERSION}"
+echo "[INFO] Repository: ${SRC_REPO}"
 echo "[INFO] Conda cache: ${CONDA_PKGS_DIRS}"
 echo ""
 
@@ -80,8 +97,6 @@ if bash "${PREFIX}/bin/run_install_conda_install.sh"; then
         echo ""
         echo "Generating modulefile..."
         export MODULESHOME="${MODULESHOME:-.modulefiles}"
-        export VERSION="${VERSION:-2026.01}"
-        export PACKAGE="${PACKAGE:-machine_learning}"
         
         if bash "${PREFIX}/bin/generate_modulefile_conda_install.sh"; then
             echo "✓ Modulefile generated"

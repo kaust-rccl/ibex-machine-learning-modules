@@ -18,11 +18,17 @@ set -euo pipefail
 PREFIX="${PREFIX:-.}"
 CONDA_ENV_NAME="${CONDA_ENV_NAME:-ml-module}"
 ENV_PREFIX="${PREFIX}/env"
+PACKAGE="${PACKAGE:-machine_learning}"
+VERSION="${VERSION:-2026.02}"
+SRC_REPO="${SRC_REPO:-https://github.com/D-Barradas/ibex-machine-learning-modules.git}"
 
 # Export variables for child script
 export PREFIX
 export ENV_PREFIX
 export CONDA_ENV_NAME
+export PACKAGE
+export VERSION
+export SRC_REPO
 
 # Check if we're in the correct directory
 if [[ ! -f "${PREFIX}/environment.yml" ]]; then
@@ -39,6 +45,9 @@ echo "Configuration:"
 echo "  Project Root (PREFIX):     ${PREFIX}"
 echo "  Environment Location:      ${ENV_PREFIX}"
 echo "  Environment Name:          ${CONDA_ENV_NAME}"
+echo "  Package Name:              ${PACKAGE}"
+echo "  Version:                   ${VERSION}"
+echo "  Repository:                ${SRC_REPO}"
 echo ""
 
 # Check for conda/mamba availability
@@ -87,8 +96,6 @@ if bash "${PREFIX}/bin/run_install_conda_install.sh"; then
     if [[ "${GENERATE_MODULEFILE:-0}" == "1" ]]; then
         echo "Generating modulefile..."
         export MODULESHOME="${MODULESHOME:-.modulefiles}"
-        export VERSION="${VERSION:-2026.01}"
-        export PACKAGE="${PACKAGE:-machine_learning}"
         
         if bash "${PREFIX}/bin/generate_modulefile_conda_install.sh"; then
             echo "✓ Modulefile generated"
@@ -100,9 +107,10 @@ if bash "${PREFIX}/bin/run_install_conda_install.sh"; then
     
     echo "Next steps:"
     echo "  1. Activate environment:  conda activate ${ENV_PREFIX}"
-    echo "  2. Run tests:             sbatch bin/test-conda-env_conda_install.sbatch"
+    echo "  2. Verify environment:    bash bin/verify_install_conda_install.sh ${ENV_PREFIX}"
+    echo "  3. Run tests:             sbatch bin/test-conda-env_conda_install.sbatch"
     if [[ "${GENERATE_MODULEFILE:-0}" != "1" ]]; then
-        echo "  3. Generate modulefile:   MODULESHOME=/path/to/modulefiles GENERATE_MODULEFILE=1 bash setup_install_conda_install.sh"
+        echo "  4. Generate modulefile:   MODULESHOME=/sw/rl9g/modulefiles GENERATE_MODULEFILE=1 bash setup_install_conda_install.sh"
     fi
     echo ""
     exit 0
