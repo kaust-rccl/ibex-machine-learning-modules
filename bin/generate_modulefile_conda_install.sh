@@ -6,18 +6,18 @@
 # allowing users to load it via: module load machine_learning/conda
 #
 # Required environment variables:
-#   VERSION         - Version string (e.g., 2026.01)
+#   VERSION         - Version string (e.g., 2026.02)
 #   ENV_PREFIX      - Path to conda environment
 #   PREFIX          - Project root directory
 #   MODULESHOME     - Modulefiles installation directory
 #   PACKAGE         - Package name (default: machine_learning)
 #
-# Generated file location: ${MODULESHOME}/${VERSION}/conda
+# Generated file location: ${MODULESHOME}/${VERSION}
 
 set -euo pipefail
 
 # Set defaults if not provided
-VERSION="${VERSION:-2026.01}"
+VERSION="${VERSION:-2026.02}"
 ENV_PREFIX="${ENV_PREFIX:-.env}"
 PREFIX="${PREFIX:-.}"
 MODULESHOME="${MODULESHOME:-.modulefiles}"
@@ -30,8 +30,8 @@ if [[ ! -d "${ENV_PREFIX}" ]]; then
 fi
 
 # Create modulefile directory
-MODULEFILE_DIR="${MODULESHOME}/${VERSION}"
-MODULEFILE_PATH="${MODULEFILE_DIR}/conda"
+MODULEFILE_DIR="${MODULESHOME}"
+MODULEFILE_PATH="${MODULEFILE_DIR}/${VERSION}"
 
 mkdir -p "${MODULEFILE_DIR}"
 
@@ -49,15 +49,14 @@ EOFMOD
 
 # Add dynamic content to the modulefile
 cat >> "${MODULEFILE_PATH}" <<EOF
+set pkg_dir         $ENV_PREFIX
 set name            $PACKAGE
 set version         $VERSION
-set env_prefix      $ENV_PREFIX
-set stack           gpu
 
 if { [module-info mode load] } {
    puts stderr "Loading module for \$name \$version"
-   puts stderr "Environment: \$env_prefix"
    puts stderr "\$name \$version is now loaded"
+   set output [exec python3 /sw/sources/elasticsearch/elasticapps.py --app "$name" --version "$version" &]
 }
 
 if { [module-info mode remove] } {
@@ -65,32 +64,16 @@ if { [module-info mode remove] } {
     puts stderr "\$name \$version is now unloaded"
 }
 
-# Set conda environment variables
-setenv ML_ENV_PREFIX $ENV_PREFIX
-setenv CONDA_DEFAULT_ENV $ENV_PREFIX
+# Specific setup goes here, license files, path setup, etc
+prepend-path PATH \$pkg_dir/bin
+prepend-path LD_LIBRARY_PATH \$pkg_dir/lib
+prepend-path LIBRARY_PATH \$pkg_dir/lib
 
-# Prepend conda environment to PATH and PYTHONPATH
-prepend-path PATH $ENV_PREFIX/bin
-prepend-path LD_LIBRARY_PATH $ENV_PREFIX/lib
-prepend-path PYTHONPATH $ENV_PREFIX/lib/python*/site-packages
+setenv CONDA_DEFAULT_ENV \$pkg_dir
+setenv CONDA_PREFIX \$pkg_dir
 
-# GPU support (if CUDA/cuDF installed)
-setenv CUDA_VISIBLE_DEVICES 0
-
-# Convenience variables
-setenv ML_PYTHON $ENV_PREFIX/bin/python
-setenv ML_PIP $ENV_PREFIX/bin/pip
-setenv ML_JUPYTER $ENV_PREFIX/bin/jupyter
-
-# Inform user how to use the environment
-puts stderr ""
-puts stderr "Conda ML Environment loaded:"
-puts stderr "  Python:  \$env_prefix/bin/python"
-puts stderr "  Jupyter: \$env_prefix/bin/jupyter lab"
-puts stderr "  Pip:     \$env_prefix/bin/pip"
-puts stderr ""
-puts stderr "To activate in script: conda activate \$env_prefix"
-puts stderr ""
+prepend-path PYTHONPATH \$pkg_dir/lib
+prepend-path PKG_CONFIG_PATH \$pkg_dir/lib/pkgconfig
 EOF
 
 # Set proper permissions
@@ -101,7 +84,7 @@ echo "[INFO] Location: ${MODULEFILE_PATH}"
 echo "[INFO] Version: ${VERSION}"
 echo ""
 echo "To use this modulefile:"
-echo "  module load ${PACKAGE}/${VERSION}/conda"
+echo "  module load ${PACKAGE}/${VERSION}"
 echo ""
 
 exit 0
