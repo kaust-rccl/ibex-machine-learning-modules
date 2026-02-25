@@ -50,20 +50,16 @@ fi
 # Set up environment variables for installation script
 
 export SOFTWARE_SOURCE_DIRECTORY="/sw/rl9g"
-export MODULESHOME="/sw/rl9g/modulefiles/applications/machine_learning"
-export PACKAGE="machine_learning"
+export PACKAGE="${PACKAGE:-machine_learning}"
 export SRCDIR="${SOFTWARE_SOURCE_DIRECTORY}/${PACKAGE}"
+export MODULESHOME="${SOFTWARE_SOURCE_DIRECTORY}/modulefiles/applications/${PACKAGE}"
+
 
 export PREFIX="${SRCDIR}/${VERSION}"
-export ENV_FOLDER_SUFFIX="rl9_cuda12.9_py3.12_env"
+export ENV_FOLDER_SUFFIX="rl9_cuda12.9_py3.12_env" # Unique suffix to distinguish this environment (e.g., based on CUDA/Python versions)
 export ENV_PREFIX="${PREFIX}/${ENV_FOLDER_SUFFIX}"
-export PACKAGE="${PACKAGE:-machine_learning}"
 export VERSION="${VERSION:-2026.02}"
 export SRC_REPO="${SRC_REPO:-https://github.com/D-Barradas/ibex-machine-learning-modules.git}"
-
-
-
-
 
 echo "[INFO] Project directory: ${PREFIX}"
 echo "[INFO] Environment path: ${ENV_PREFIX}"
