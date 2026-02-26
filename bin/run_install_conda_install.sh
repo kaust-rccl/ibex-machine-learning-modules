@@ -38,7 +38,7 @@ fi
 
 # ========================== SETUP ==========================
 # INSTALL_BUILD_PATH="${PREFIX}/ml-module-${VERSION}"
-INSTALL_BUILD_PATH="$PWD/machine_learning-module"
+INSTALL_BUILD_PATH="${ENV_PREFIX}"
 
 LOG_FILE="conda_install.log"
 
