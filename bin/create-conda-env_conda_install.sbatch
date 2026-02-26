@@ -52,61 +52,80 @@ fi
 export SOFTWARE_SOURCE_DIRECTORY="/sw/rl9g"
 export PACKAGE="${PACKAGE:-machine_learning}"
 export SRCDIR="${SOFTWARE_SOURCE_DIRECTORY}/${PACKAGE}"
+export VERSION="${VERSION:-2026.02}"
 export MODULESHOME="${SOFTWARE_SOURCE_DIRECTORY}/modulefiles/applications/${PACKAGE}"
 
-
+# PREFIX is the working directory where repo will be cloned
 export PREFIX="${SRCDIR}/${VERSION}"
-export ENV_FOLDER_SUFFIX="rl9_cuda12.9_py3.12_env" # Unique suffix to distinguish this environment (e.g., based on CUDA/Python versions)
+export ENV_FOLDER_SUFFIX="rl9_cuda12.9_py3.12_env"
 export ENV_PREFIX="${PREFIX}/${ENV_FOLDER_SUFFIX}"
-export VERSION="${VERSION:-2026.02}"
 export SRC_REPO="${SRC_REPO:-https://github.com/D-Barradas/ibex-machine-learning-modules.git}"
 
-echo "[INFO] Project directory: ${PREFIX}"
-echo "[INFO] Environment path: ${ENV_PREFIX}"
+echo "[INFO] Software directory: ${SOFTWARE_SOURCE_DIRECTORY}"
 echo "[INFO] Package name: ${PACKAGE}"
 echo "[INFO] Version: ${VERSION}"
+echo "[INFO] Working directory (PREFIX): ${PREFIX}"
+echo "[INFO] Final env location (ENV_PREFIX): ${ENV_PREFIX}"
 echo "[INFO] Repository: ${SRC_REPO}"
 echo "[INFO] Conda cache: ${CONDA_PKGS_DIRS}"
 echo ""
 
-# Create necessary directories
+# Create necessary directories for PREFIX
+mkdir -p "${PREFIX}"
 mkdir -p "${PREFIX}/logs"
-mkdir -p "$(dirname "${ENV_PREFIX}")"
 
-# Run the installation
-echo "Starting installation at $(date)..."
-echo "=========================================="
-if bash "${PREFIX}/bin/run_install_conda_install.sh"; then
-    echo ""
-    echo "=========================================="
-    echo "✓ Environment created successfully"
-    echo "End Time: $(date)"
-    echo "=========================================="
-    
-    # Quick verification
-    echo ""
-    echo "Running quick verification..."
-    bash "${PREFIX}/bin/verify_install_conda_install.sh" "${ENV_PREFIX}" || true
-    
-    # Optional: Generate modulefile
-    if [[ "${GENERATE_MODULEFILE:-0}" == "1" ]]; then
-        echo ""
-        echo "Generating modulefile..."
-        export MODULESHOME="${MODULESHOME:-.modulefiles}"
-        
-        if bash "${PREFIX}/bin/generate_modulefile_conda_install.sh"; then
-            echo "✓ Modulefile generated"
-        else
-            echo "⚠ Modulefile generation failed (non-critical)"
-        fi
-    fi
-    
-    exit 0
+# Run the installation from SLURM_SUBMIT_DIR
+echo \"Starting installation at $(date)...\"
+echo \"==========================================\"
+
+# ========================== STEP 1: CLONE REPOSITORY ==========================
+echo "[INFO] STEP 1: Create the environment directory..."
+echo "========================================================================="
+mkdir -p "${ENV_PREFIX}"
+
+# ========================== STEP 2: CLONE REPOSITORY ==========================
+echo "[INFO] STEP 2: Cloning repository into the environment directory..."
+echo "========================================================================="
+
+# Check for git command availability
+command -v git >/dev/null 2>&1 || { 
+    echo "$PACKAGE - git is required but not installed - installation failed"
+    exit 1
+}
+
+# Clone the repository
+if ! git clone "${SRC_REPO}" -b "machine-learning-${VERSION}" "${ENV_PREFIX}" 2>&1 | tee -a "$LOG_FILE"; then
+    echo "[$(date '+%Y-%m-%d %H:%M:%S')] ✗ Repository clone failed"
+    echo "$PACKAGE - repository clone failure - installation failed"
+    exit 1
+fi
+
+echo "[$(date '+%Y-%m-%d %H:%M:%S')] ✓ Repository cloned successfully"
+echo ""
+
+
+# ========================== STEP 3: run_install ==========================
+echo "[INFO] STEP 3: Running installation script..."
+echo "========================================================================="
+if bash "${ENV_PREFIX}/bin/run_install_conda_install.sh" 2>&1 | tee -a "$LOG_FILE"; then
+    echo "[$(date '+%Y-%m-%d %H:%M:%S')] ✓ Installation completed successfully"
 else
-    echo ""
-    echo "=========================================="
-    echo "✗ Environment creation failed"
-    echo "End Time: $(date)"
-    echo "=========================================="
+    echo "[$(date '+%Y-%m-%d %H:%M:%S')] ✗ Installation failed"
+    echo "$PACKAGE - installation script failure - installation failed"
+    exit 1
+fi  
+
+echo "=========================================="
+echo "Installation finished at $(date)"
+echo "=========================================="
+
+# ========================== STEP 4: create the module file ==========================
+echo "[INFO] STEP 4: Creating module file..."
+echo "========================================================================="
+if bash "${PREFIX}/bin/generate_modulefile_conda_install.sh" 2>&1 | tee -a "$LOG_FILE"; then
+    echo "[$(date '+%Y-%m-%d %H:%M:%S')] ✓ Module file created successfully"
+else
+    echo "[$(date '+%Y-%m-%d %H:%M:%S')] ✗ Module file creation failed"
+    echo "$PACKAGE - module file creation failure - installation failed"
     exit 1
 fi
