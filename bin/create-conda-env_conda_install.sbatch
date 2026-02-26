@@ -87,6 +87,12 @@ mkdir -p "${ENV_PREFIX}"
 echo "[INFO] STEP 2: Cloning repository into the environment directory..."
 echo "========================================================================="
 
+LOG_FILE="${PREFIX}/logs/conda_install.log"
+
+# Setup logging
+exec > >(tee -a "$LOG_FILE")
+exec 2>&1
+
 # Check for git command availability
 command -v git >/dev/null 2>&1 || { 
     echo "$PACKAGE - git is required but not installed - installation failed"
