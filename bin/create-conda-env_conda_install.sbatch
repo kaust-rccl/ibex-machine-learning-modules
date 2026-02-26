@@ -1,9 +1,9 @@
 #!/bin/bash
-#SBATCH --time=02:00:00
+#SBATCH --time=01:00:00
 #SBATCH --gpus-per-node=v100:1
 #SBATCH --cpus-per-gpu=4
 #SBATCH --mem=32G
-#SBATCH --partition=batch
+#SBATCH --partition=debug
 #SBATCH --job-name=conda-env-create
 #SBATCH --mail-type=END,FAIL
 #SBATCH --output=logs/%x-%j-slurm.out
@@ -75,8 +75,8 @@ mkdir -p "${PREFIX}"
 mkdir -p "${PREFIX}/logs"
 
 # Run the installation from SLURM_SUBMIT_DIR
-echo \"Starting installation at $(date)...\"
-echo \"==========================================\"
+echo "Starting installation at $(date)..."
+echo "=========================================="
 
 # ========================== STEP 1: CLONE REPOSITORY ==========================
 echo "[INFO] STEP 1: Create the environment directory..."
@@ -87,7 +87,7 @@ mkdir -p "${ENV_PREFIX}"
 echo "[INFO] STEP 2: Cloning repository into the environment directory..."
 echo "========================================================================="
 
-LOG_FILE="${PREFIX}/logs/conda_install.log"
+LOG_FILE="${PREFIX}/logs/slurm_install.log"
 
 # Setup logging
 exec > >(tee -a "$LOG_FILE")
