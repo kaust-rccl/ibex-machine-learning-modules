@@ -34,7 +34,7 @@ echo "Start Time:    $(date)"
 echo ""
 
 # Initialize conda
-export CONDA_PKGS_DIRS="${SLURM_TMPDIR:-.}/.conda_cache"
+export CONDA_PKGS_DIRS="/ibex/user/${USER}/conda_cache"
 mkdir -p "$CONDA_PKGS_DIRS"
 
 # Source conda activation
