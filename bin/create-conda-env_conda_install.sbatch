@@ -128,7 +128,7 @@ echo "=========================================="
 # ========================== STEP 4: create the module file ==========================
 echo "[INFO] STEP 4: Creating module file..."
 echo "========================================================================="
-if bash "${PREFIX}/bin/generate_modulefile_conda_install.sh" 2>&1 | tee -a "$LOG_FILE"; then
+if bash "${ENV_PREFIX}/bin/generate_modulefile_conda_install.sh" 2>&1 | tee -a "$LOG_FILE"; then
     echo "[$(date '+%Y-%m-%d %H:%M:%S')] ✓ Module file created successfully"
 else
     echo "[$(date '+%Y-%m-%d %H:%M:%S')] ✗ Module file creation failed"
