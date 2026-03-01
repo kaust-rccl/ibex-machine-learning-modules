@@ -17,11 +17,11 @@
 set -euo pipefail
 
 # Set defaults if not provided
-VERSION="${VERSION:-2026.02}"
-ENV_PREFIX="${ENV_PREFIX:-.env}"
-PREFIX="${PREFIX:-.}"
-MODULESHOME="${MODULESHOME:-.modulefiles}"
-PACKAGE="${PACKAGE:-machine_learning}"
+# VERSION="${VERSION:-2026.02}"
+# ENV_PREFIX="${ENV_PREFIX:-.env}"
+# PREFIX="${PREFIX:-.}"
+# MODULESHOME="${MODULESHOME:-.modulefiles}"
+# PACKAGE="${PACKAGE:-machine_learning}"
 
 # Verify environment exists
 if [[ ! -d "${ENV_PREFIX}" ]]; then
