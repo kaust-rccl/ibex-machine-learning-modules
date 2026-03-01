@@ -192,20 +192,20 @@ fi
 echo "[$(date '+%Y-%m-%d %H:%M:%S')] ✓ Installation verification complete"
 echo ""
 
-# ========================== STEP 7: CLEANUP BUILD ARTIFACTS ==========================
-echo "[INFO] STEP 7: Cleaning up build artifacts..."
-echo "========================================================================="
+# # ========================== STEP 7: CLEANUP BUILD ARTIFACTS ==========================
+# echo "[INFO] STEP 7: Cleaning up build artifacts..."
+# echo "========================================================================="
 
-# Change back to PREFIX before cleanup
-cd "${PREFIX}"
+# # Change back to PREFIX before cleanup
+# cd "${PREFIX}"
 
-# Remove cloned repository (largest space consumer)
-if [[ -d "${INSTALL_BUILD_PATH}" ]]; then
-    REPO_SIZE=$(du -sh "${INSTALL_BUILD_PATH}" 2>/dev/null | cut -f1 || echo "unknown")
-    echo "[INFO] Removing cloned repository: ${INSTALL_BUILD_PATH} (size: $REPO_SIZE)"
-    rm -rf "${INSTALL_BUILD_PATH}"
-    echo "[INFO] ✓ Repository cleaned"
-fi
+# # Remove cloned repository (largest space consumer)
+# if [[ -d "${INSTALL_BUILD_PATH}" ]]; then
+#     REPO_SIZE=$(du -sh "${INSTALL_BUILD_PATH}" 2>/dev/null | cut -f1 || echo "unknown")
+#     echo "[INFO] Removing cloned repository: ${INSTALL_BUILD_PATH} (size: $REPO_SIZE)"
+#     rm -rf "${INSTALL_BUILD_PATH}"
+#     echo "[INFO] ✓ Repository cleaned"
+# fi
 
 # Archive logs with timestamp
 if [[ -f "$LOG_FILE" ]]; then
@@ -226,8 +226,8 @@ if [[ -f "$LOG_FILE" ]]; then
     rm -f "$LOG_FILE"
 fi
 
-echo "[INFO] ✓ Cleanup complete"
-echo ""
+# echo "[INFO] ✓ Cleanup complete"
+# echo ""
 
 # ========================== FINAL SUMMARY ==========================
 echo "[$(date '+%Y-%m-%d %H:%M:%S')] Installation completed successfully"
