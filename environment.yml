@@ -1,46 +1,158 @@
-name: null
+name: ml-module
 channels:
   - pytorch
   - nvidia
-  - rapidsai-nightly
+  - rapidsai
   - conda-forge
   - defaults
 dependencies:
-  - rapids=24.12
+  # Core Python & CUDA
   - python=3.12
-  - cuda-version[version='>=12.0,<=12.5']
-  - pytorch
-  - torchvision
-  - torchaudio
-  - pytorch-cuda
-  - jupyterlab
-  - dash
-  - graphistry
-  - nx-cugraph=24.12
-  - tensorflow
-  - xarray-spatial
-  - dask-sql
-  - code-server
+  - 'cuda-version>=12.2,<=12.9'
+  
+  # Deep Learning Frameworks (all these frameworks prefer pip instead of conda for CUDA 12)
+  # - 'pytorch=*=*cuda*'
+  # - 'pytorch-mutex=*=cuda*'
+  # - pytorch-cuda
+  # - torchvision
+  # - torchaudio
+  # - pytorch-lightning
+  # - 'tensorflow=*=*cuda*'
+  # - jax
+  # - 'jaxlib=*=*cuda*'
+  
+  # Distributed Computing
+  - dask
   - dask-ml
-  - torchinfo
-  - seaborn
-  - jax
+  - dask-sql
   - dask-labextension
+  - ray-default
+  - ray-tune
+  - ray-train
+  
+  # Machine Learning
+  - lightgbm
+  - catboost
+  - xgboost
+  - scikit-learn
+  - scikit-optimize
+  
+  # Data Processing
+  - pandas
+  - polars
+  - numpy
+  - scipy
+  - xarray
+  - xarray-spatial
+  - netcdf4
+  - zarr
+  - h5py
+  
+  # Hyperparameter Optimization
+  - optuna
+  - optuna-integration
+  
+  # Experiment Tracking
+  - mlflow
+  - wandb
+  - tensorboard
+  - tensorboardx
+  
+  # Transformers & NLP
+  - transformers
+  - datasets
+  - tokenizers
+  - sentencepiece
+  - accelerate
+  
+  # Visualization
+  - matplotlib
+  - seaborn
+  - plotly
+  - dash
   - streamlit
   - streamlit-folium
-  - wandb
-  - gh
-  - lightgbm
-  - git
+  - folium
+  - hvplot
+  - holoviews
+  - graphistry
+  
+  # Development Tools
+  - jupyterlab
+  - jupyter
+  - jupyterlab-nvdashboard
+  - ipykernel
+  - ipywidgets
+  - code-server
+  - jedi-language-server
+  - python-lsp-server
+  
+  # Configuration & Utilities
+  - hydra-core
+  - omegaconf
+  - pydantic
+  - python-dotenv
+  - typer
+  - click
+  - rich
+  
+  # GPU & System Monitoring
+  - gpustat
+  # - prometheus-client
+  - psutil
+  - py-spy
+  
+  # HPC & MPI
+  - mpi4py
+  
+  # Additional Tools
   - umap-learn
   - prophet
-  - ignite
+  - networkx
+  - scikit-image
+  - git
+  - gh
+  - python-lsp-server
+  
+  # Language servers (optional)
   - texlab
-  - webcolors
   - r-languageserver
-  - jedi-language-server
   - jsonschema-with-format-nongpl
-  - jaxlib[build=*cuda*]
-  - ca-certificates
-  - certifi
-  - openssl
+  
+  # Pip packages (for packages not available in conda)
+  - pip
+  - pip:
+    # RAPIDS packages via pip (CUDA 12)
+    - --extra-index-url https://pypi.nvidia.com
+    - cudf-cu12==26.02.*
+    - dask-cudf-cu12==26.02.*
+    - cuml-cu12==26.02.*
+    - cugraph-cu12==26.02.*
+    - nx-cugraph-cu12==26.02.*
+    - cuxfilter-cu12==26.02.*
+    - cucim-cu12==26.02.*
+    - pylibraft-cu12==26.02.*
+    - raft-dask-cu12==26.02.*
+    - cuvs-cu12==26.02.*
+    # pytorch packages via pip (CUDA 12.8)
+    - --extra-index-url https://download.pytorch.org/whl/cu128
+    - torch==2.10.0 
+    - torchvision==0.25.0 
+    - torchaudio==2.10.0
+    # Other pip packages
+    - jupyter-ai
+    - evaluate
+    - opencensus
+    - opencensus-context
+    - opentelemetry-api
+    - opentelemetry-sdk
+    - opentelemetry-exporter-otlp
+    - torch-tb-profiler
+    - pydantic-settings
+    - optuna-dashboard
+    - nvidia-ml-py
+    - pynvml==11.5.0
+    - jupyterlab-nvdashboard==0.9.0
+    - jax[cuda12]
+    - tensorflow[and-cuda]
+ 

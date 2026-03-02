@@ -134,3 +134,10 @@ bin/create-conda-env-*-slurm.err
 
 # DCGM reports
 dcgm/
+
+# ignore scan reports
+scan-reports/
+**.out
+**.err
+**.log
+**.sif

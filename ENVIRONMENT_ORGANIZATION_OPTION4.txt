@@ -1,0 +1,215 @@
+================================================================================
+ENVIRONMENT.YML REORGANIZATION - OPTION 4: BY ROLE/WORKFLOW
+================================================================================
+
+This structure groups libraries by how users work with them, making it intuitive
+to enable/disable entire workflows and understand dependencies.
+
+================================================================================
+GROUP 1: DATA PREPARATION (Core Data Wrangling)
+================================================================================
+Purpose: Load, clean, transform, and explore data
+- pandas              # Tabular data manipulation
+- polars              # Fast DataFrame operations
+- numpy               # Numerical computing
+- scipy               # Scientific computing
+- xarray              # Multi-dimensional array operations
+- xarray-spatial      # Raster data operations (geospatial)
+- netcdf4             # NetCDF file format support
+- zarr                # Chunked, compressed arrays
+- h5py                # HDF5 file format support
+
+================================================================================
+GROUP 2: MODEL BUILDING (Deep Learning & Core ML)
+================================================================================
+Purpose: Build neural networks and machine learning models
+Core Deep Learning:
+  - torch==2.10.0           # PyTorch framework
+  - torchvision==0.25.0     # CV models & datasets
+  - torchaudio==2.10.0      # Audio processing
+  - tensorflow[and-cuda]    # TensorFlow framework
+  - jax[cuda12]             # JAX high-performance ML
+  
+Supporting Libraries:
+  - scikit-learn            # Classical ML algorithms
+  - transformers            # Pre-trained NLP models (HuggingFace)
+  - datasets                # Dataset loading library
+  - tokenizers              # Fast tokenization
+  - sentencepiece           # Byte-pair encoding
+  - accelerate              # Distributed training helper
+
+================================================================================
+GROUP 3: MODEL OPTIMIZATION (Gradient Boosting & HPO)
+================================================================================
+Purpose: Optimize model hyperparameters and use gradient boosting
+Gradient Boosting Libraries:
+  - xgboost                 # XGBoost tree boosting
+  - lightgbm                # LightGBM gradient boosting
+  - catboost                # CatBoost categorical boosting
+  - scikit-optimize         # Bayesian optimization
+  
+Hyperparameter Optimization:
+  - optuna                  # Bayesian optimization framework
+  - optuna-integration      # Optuna integrations
+  - optuna-dashboard        # Optuna visualization
+
+================================================================================
+GROUP 4: TRAINING & SCALING (Distributed & Parallel Computing)
+================================================================================
+Purpose: Scale training across multiple GPUs/nodes
+- dask                      # Parallel computing framework
+- dask-ml                   # Dask ML algorithms
+- dask-sql                  # SQL interface for Dask
+- dask-labextension         # JupyterLab extension for Dask
+- ray-default               # Ray distributed computing
+- ray-tune                  # Ray hyperparameter tuning
+- ray-train                 # Ray distributed training
+- mpi4py                    # Message Passing Interface
+- torch-tb-profiler         # PyTorch profiler for TensorBoard
+
+================================================================================
+GROUP 5: MONITORING & EXPERIMENTS (Experiment Tracking)
+================================================================================
+Purpose: Track experiments, log metrics, monitor model performance
+- mlflow                    # Experiment tracking & model registry
+- wandb                     # Weights & Biases (experiment tracking)
+- tensorboard               # Visualization of training metrics
+- tensorboardx              # TensorBoard for PyTorch
+- nvidia-ml-py              # NVIDIA GPU monitoring
+- pynvml==11.5.0            # Python bindings for NVIDIA ML
+- py-spy                    # Sampling profiler for Python
+
+================================================================================
+GROUP 6: ANALYSIS & VISUALIZATION (Interactive Exploration)
+================================================================================
+Purpose: Visualize data, create dashboards, explore results
+Core Visualization:
+  - matplotlib              # 2D plotting library
+  - seaborn                 # Statistical data visualization
+  - plotly                  # Interactive web-based graphics
+  - hvplot                  # Convenient Holoviews interface
+  - holoviews               # Composable, declarative data visualization
+  
+Geospatial & Network:
+  - folium                  # Leaflet.js map integration
+  - streamlit-folium        # Streamlit + Folium integration
+  - networkx                # Network/graph analysis
+  - graphistry              # GPU-accelerated graph visualization
+
+================================================================================
+GROUP 7: INTERACTIVE DEVELOPMENT (Notebooks & IDEs)
+================================================================================
+Purpose: Interactive development, notebooks, code editing
+Jupyter Environment:
+  - jupyterlab              # JupyterLab IDE
+  - jupyter                 # Jupyter Notebook
+  - ipykernel               # IPython kernel for Jupyter
+  - ipywidgets              # Interactive widgets for notebooks
+  - jupyterlab-nvdashboard  # GPU dashboard for JupyterLab
+  
+Code Editing & AI:
+  - code-server             # VS Code in browser
+  - jupyter-ai              # AI code generation for Jupyter
+  - jedi-language-server    # Language server for code completion
+  - python-lsp-server       # Python Language Server Protocol
+  - texlab                  # LaTeX language server (optional)
+
+================================================================================
+GROUP 8: CONFIGURATION & UTILITIES (Core Infrastructure)
+================================================================================
+Purpose: Application configuration, utilities, dependencies
+Configuration & CLI:
+  - hydra-core              # Configuration management framework
+  - omegaconf               # Configuration library (Hydra backend)
+  - pydantic                # Data validation using Python type hints
+  - pydantic-settings       # Pydantic settings management
+  - python-dotenv           # Load environment variables from .env
+  - typer                   # CLI framework using type hints
+  - click                   # Python CLI toolkit
+  - rich                    # Rich terminal output formatting
+  
+Development Tools:
+  - git                     # Version control
+  - gh                      # GitHub CLI
+  - psutil                  # System and process utilities
+  
+Additional ML Tools:
+  - umap-learn              # Dimensionality reduction
+  - prophet                 # Time series forecasting
+  - scikit-image            # Image processing algorithms
+  - evaluate                # Evaluate NLP models
+  - opencensus              # Distributed tracing
+  - opencensus-context      # OpenCensus context propagation
+  - opentelemetry-api       # OpenTelemetry observability API
+  - opentelemetry-sdk       # OpenTelemetry SDK
+  - opentelemetry-exporter-otlp  # OTLP exporter
+
+================================================================================
+GROUP 9: INTERACTIVE DASHBOARDS & APPS (Web Applications)
+================================================================================
+Purpose: Deploy interactive web applications
+- dash                      # Web application framework (Plotly)
+- streamlit                 # Rapid app development framework
+
+================================================================================
+GROUP 10: RAPIDS GPU ACCELERATION (Optional - High Performance Data Science)
+================================================================================
+Purpose: GPU-accelerated data science (optional, can be disabled)
+Note: Installed via pip with CUDA 12 index
+- cudf-cu12==26.02.*        # GPU DataFrames (like pandas)
+- dask-cudf-cu12==26.02.*   # Dask + GPU DataFrames
+- cuml-cu12==26.02.*        # GPU Machine Learning algorithms
+- cugraph-cu12==26.02.*     # GPU Graph Analytics
+- nx-cugraph-cu12==26.02.*  # NetworkX + GPU acceleration
+- cuxfilter-cu12==26.02.*   # GPU-accelerated dataframe filtering
+- cucim-cu12==26.02.*       # GPU image processing
+- pylibraft-cu12==26.02.*   # RAFT library (vector search)
+- raft-dask-cu12==26.02.*   # RAFT + Dask integration
+- cuvs-cu12==26.02.*        # CUDA machine learning functions
+
+================================================================================
+DEPENDENCIES
+================================================================================
+Core System:
+  - python=3.12
+  - cuda-version>=12.2,<=12.9  # CUDA version pinning
+
+Package Management:
+  - pip                     # Python package installer
+  - pip: [...]              # Additional pip packages (see above)
+
+Channels (in order):
+  1. pytorch                # PyTorch official
+  2. nvidia                 # NVIDIA official
+  3. rapidsai               # RAPIDS official
+  4. conda-forge            # Community packages
+  5. defaults               # Conda defaults
+
+================================================================================
+USAGE NOTES
+================================================================================
+
+1. ENABLING/DISABLING WORKFLOWS
+   - You can comment out entire groups if not needed
+   - For example, comment out GROUP 9 (Dashboards) if you don't need Streamlit/Dash
+   - Comment out GROUP 10 (RAPIDS) if you don't use GPU-accelerated data science
+
+2. DEPENDENCY RELATIONSHIPS
+   - GROUP 4 (Training & Scaling) depends on GROUP 2 (Model Building)
+   - GROUP 5 (Monitoring) works with any GROUP 2-4 tools
+   - GROUP 6 (Visualization) is independent of other groups
+   - GROUP 10 (RAPIDS) enhances GROUP 1 (Data Preparation) with GPU support
+
+3. OPTIONAL PACKAGES
+   - Language servers (texlab, r-languageserver) are optional
+   - RAPIDS (GROUP 10) requires NVIDIA GPU but is optional
+   - Graphistry is optional for network visualization
+   - Streamlit & Dash can be used interchangeably
+
+4. RESOURCE CONSIDERATIONS
+   - Full installation: ~15-20 GB
+   - Minimal (GROUP 1-3 only): ~5-8 GB
+   - Development (GROUP 1-3, 7): ~8-12 GB
+   - Production (GROUP 1-6): ~15 GB
+
+================================================================================
