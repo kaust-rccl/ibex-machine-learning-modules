@@ -56,7 +56,7 @@ set version         $VERSION
 if { [module-info mode load] } {
    puts stderr "Loading module for \$name \$version"
    puts stderr "\$name \$version is now loaded"
-   set output [exec python3 /sw/sources/elasticsearch/elasticapps.py --app "$name" --version "$version" &]
+   set output [exec python3 /sw/sources/elasticsearch/elasticapps.py --app "$PACKAGE" --version "$VERSION" &]
 }
 
 if { [module-info mode remove] } {
