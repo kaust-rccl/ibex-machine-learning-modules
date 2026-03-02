@@ -15,7 +15,7 @@
 #   1  - Failure
 #
 # Installation Flow:
-#   1. Clone repository from SRC_REPO to INSTALL_BUILD_PATH
+#   1. Clone repository from SRC_REPO to ENV_PREFIX
 #   2. cd into cloned directory
 #   3. Verify environment.yml exists
 #   4. Check conda/mamba availability
@@ -38,7 +38,7 @@ fi
 
 # ========================== SETUP ==========================
 # INSTALL_BUILD_PATH="${PREFIX}/ml-module-${VERSION}"
-INSTALL_BUILD_PATH="${ENV_PREFIX}"
+INSTALL_BUILD_PATH="${ENV_PREFIX}/env"
 
 LOG_FILE="conda_install.log"
 
@@ -53,8 +53,8 @@ echo "[INFO] Version:              $VERSION"
 echo "[INFO] Repository:           $SRC_REPO"
 echo "[INFO] Working directory:    $PREFIX"
 echo "[INFO] Installation branch:  machine-learning-${VERSION}"
-echo "[INFO] Build path:           $INSTALL_BUILD_PATH"
-echo "[INFO] Final env location:   $ENV_PREFIX"
+echo "[INFO] Build path:           $ENV_PREFIX"
+echo "[INFO] Final env location:   $INSTALL_BUILD_PATH"
 echo ""
 
 # # ========================== STEP 1: CLONE REPOSITORY ==========================
@@ -81,8 +81,8 @@ echo ""
 echo "[INFO] STEP 2: Entering build directory..."
 echo "========================================================================="
 
-if ! cd "${INSTALL_BUILD_PATH}"; then
-    echo "[ERROR] Failed to cd into ${INSTALL_BUILD_PATH}"
+if ! cd "${ENV_PREFIX}"; then
+    echo "[ERROR] Failed to cd into ${ENV_PREFIX}"
     exit 1
 fi
 
@@ -127,20 +127,20 @@ echo ""
 echo "[INFO] STEP 5: Creating conda environment..."
 echo "========================================================================="
 
-# Set conda package cache directory
-export CONDA_PKGS_DIRS="${CONDA_PKGS_DIRS:-.conda_cache}"
-mkdir -p "$CONDA_PKGS_DIRS"
+# Set conda package cache directory if the environment variable is set, otherwise use default
+# export CONDA_PKGS_DIRS="${CONDA_PKGS_DIRS:-.conda_cache}"
+# mkdir -p "$CONDA_PKGS_DIRS"
 echo "[INFO] Conda cache directory: $CONDA_PKGS_DIRS"
 echo "[INFO] Environment file: ./environment.yml"
-echo "[INFO] Target location: ${ENV_PREFIX}"
+echo "[INFO] Target location: ${INSTALL_BUILD_PATH}"
 echo ""
 
 # Create necessary parent directories
-mkdir -p "$(dirname "${ENV_PREFIX}")"
+# mkdir -p "$(dirname "${INSTALL_BUILD_PATH}")"
 
 # Create the conda environment
 if $CONDA_CMD env create \
-    --prefix "$ENV_PREFIX" \
+    --prefix "${INSTALL_BUILD_PATH}" \
     --file "./environment.yml" \
     --force \
     2>&1 | tee -a "$LOG_FILE"; then
@@ -163,27 +163,27 @@ echo "[INFO] STEP 6: Verifying installation..."
 echo "========================================================================="
 
 # Verify environment directory exists
-if [[ ! -d "${ENV_PREFIX}" ]]; then
-    echo "[ERROR] Environment directory not found at ${ENV_PREFIX}"
+if [[ ! -d "${INSTALL_BUILD_PATH}" ]]; then
+    echo "[ERROR] Environment directory not found at ${INSTALL_BUILD_PATH}"
     echo "$PACKAGE - environment directory not created - installation failed"
     exit 1
 fi
 
-echo "[INFO] ✓ Environment directory exists: ${ENV_PREFIX}"
+echo "[INFO] ✓ Environment directory exists: ${INSTALL_BUILD_PATH}"
 
 # Verify Python is available
-if [[ -f "${ENV_PREFIX}/bin/python" ]]; then
-    PYTHON_VERSION=$(${ENV_PREFIX}/bin/python --version 2>&1)
+if [[ -f "${INSTALL_BUILD_PATH}/bin/python" ]]; then
+    PYTHON_VERSION=$(${INSTALL_BUILD_PATH}/bin/python --version 2>&1)
     echo "[INFO] ✓ Python available: $PYTHON_VERSION"
 else
-    echo "[ERROR] Python executable not found at ${ENV_PREFIX}/bin/python"
+    echo "[ERROR] Python executable not found at ${INSTALL_BUILD_PATH}/bin/python"
     echo "$PACKAGE - python not installed - installation failed"
     exit 1
 fi
 
 # Optional: Verify core packages (quick check)
 echo "[INFO] Verifying core packages..."
-if ${ENV_PREFIX}/bin/python -c "import numpy, pandas, sklearn" 2>/dev/null; then
+if ${INSTALL_BUILD_PATH}/bin/python -c "import numpy, pandas, sklearn" 2>/dev/null; then
     echo "[INFO] ✓ Core packages verified (numpy, pandas, sklearn)"
 else
     echo "[WARNING] Could not verify all core packages"
@@ -219,7 +219,7 @@ if [[ -f "$LOG_FILE" ]]; then
     {
         echo "Installation completed successfully at $(date)"
         echo "Package: $PACKAGE, Version: $VERSION"
-        echo "Environment location: ${ENV_PREFIX}"
+        echo "Environment location: ${INSTALL_BUILD_PATH}"
         echo "Log archive: $ARCHIVE_NAME"
     } >> "${PREFIX}/installation_metadata.log"
     
@@ -232,9 +232,9 @@ fi
 # ========================== FINAL SUMMARY ==========================
 echo "[$(date '+%Y-%m-%d %H:%M:%S')] Installation completed successfully"
 echo "========================================================================="
-echo "[INFO] Environment location: ${ENV_PREFIX}"
-echo "[INFO] To activate:          conda activate ${ENV_PREFIX}"
-echo "[INFO] To verify:            bash bin/verify_install_conda_install.sh ${ENV_PREFIX}"
+echo "[INFO] Environment location: ${INSTALL_BUILD_PATH}"
+echo "[INFO] To activate:          conda activate ${INSTALL_BUILD_PATH}"
+echo "[INFO] To verify:            bash bin/verify_install_conda_install.sh ${INSTALL_BUILD_PATH}"
 echo "[INFO] To test:              sbatch bin/test-conda-env_conda_install.sbatch"
 echo ""
 
