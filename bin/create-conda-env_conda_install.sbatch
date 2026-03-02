@@ -1,9 +1,9 @@
 #!/bin/bash
-#SBATCH --time=01:00:00
+#SBATCH --time=02:00:00
 #SBATCH --gpus-per-node=v100:1
 #SBATCH --cpus-per-gpu=4
 #SBATCH --mem=32G
-#SBATCH --partition=debug
+#SBATCH --partition=batch
 #SBATCH --job-name=conda-env-create
 #SBATCH --mail-type=END,FAIL
 #SBATCH --output=logs/%x-%j-slurm.out
@@ -57,7 +57,7 @@ export MODULESHOME="${SOFTWARE_SOURCE_DIRECTORY}/modulefiles/applications/${PACK
 
 # PREFIX is the working directory where repo will be cloned
 export PREFIX="${SRCDIR}/${VERSION}"
-export ENV_FOLDER_SUFFIX="rl9_cuda12.9_py3.12_env"
+export ENV_FOLDER_SUFFIX="rl9_cuda12.9_py3.12"
 export ENV_PREFIX="${PREFIX}/${ENV_FOLDER_SUFFIX}"
 export SRC_REPO="${SRC_REPO:-https://github.com/D-Barradas/ibex-machine-learning-modules.git}"
 
