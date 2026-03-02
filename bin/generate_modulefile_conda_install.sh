@@ -17,15 +17,15 @@
 set -euo pipefail
 
 # Set defaults if not provided
-# VERSION="${VERSION:-2026.02}"
-# ENV_PREFIX="${ENV_PREFIX:-.env}"
-# PREFIX="${PREFIX:-.}"
-# MODULESHOME="${MODULESHOME:-.modulefiles}"
-# PACKAGE="${PACKAGE:-machine_learning}"
+VERSION="${VERSION:-2026.02}"
+ENV_PREFIX="${ENV_PREFIX:-.env}"
+PREFIX="${PREFIX:-.}"
+MODULESHOME="${MODULESHOME:-.modulefiles}"
+PACKAGE="${PACKAGE:-machine_learning}"
 
 # Verify environment exists
-if [[ ! -d "${ENV_PREFIX}/env" ]]; then
-    echo "ERROR: Conda environment not found at ${ENV_PREFIX}/env"
+if [[ ! -d "${ENV_PREFIX}" ]]; then
+    echo "ERROR: Conda environment not found at ${ENV_PREFIX}"
     exit 1
 fi
 
@@ -36,7 +36,7 @@ MODULEFILE_PATH="${MODULEFILE_DIR}/${VERSION}"
 mkdir -p "${MODULEFILE_DIR}"
 
 echo "[INFO] Generating conda modulefile..."
-echo "[INFO] Environment: ${ENV_PREFIX}/env"
+echo "[INFO] Environment: ${ENV_PREFIX}"
 
 # Generate the modulefile
 cat > "${MODULEFILE_PATH}" <<'EOFMOD'
@@ -49,14 +49,14 @@ EOFMOD
 
 # Add dynamic content to the modulefile
 cat >> "${MODULEFILE_PATH}" <<EOF
-set pkg_dir         $ENV_PREFIX/env
+set pkg_dir         $ENV_PREFIX
 set name            $PACKAGE
 set version         $VERSION
 
 if { [module-info mode load] } {
    puts stderr "Loading module for \$name \$version"
    puts stderr "\$name \$version is now loaded"
-   set output [exec python3 /sw/sources/elasticsearch/elasticapps.py --app "\$name" --version "\$version" &]
+   set output [exec python3 /sw/sources/elasticsearch/elasticapps.py --app "$name" --version "$version" &]
 }
 
 if { [module-info mode remove] } {
@@ -72,7 +72,6 @@ prepend-path LIBRARY_PATH \$pkg_dir/lib
 setenv CONDA_DEFAULT_ENV \$pkg_dir
 setenv CONDA_PREFIX \$pkg_dir
 
-prepend-path PYTHONPATH \$pkg_dir/lib
 prepend-path PKG_CONFIG_PATH \$pkg_dir/lib/pkgconfig
 EOF
 
