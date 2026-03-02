@@ -24,8 +24,8 @@ set -euo pipefail
 # PACKAGE="${PACKAGE:-machine_learning}"
 
 # Verify environment exists
-if [[ ! -d "${ENV_PREFIX}" ]]; then
-    echo "ERROR: Conda environment not found at ${ENV_PREFIX}"
+if [[ ! -d "${ENV_PREFIX}/env" ]]; then
+    echo "ERROR: Conda environment not found at ${ENV_PREFIX}/env"
     exit 1
 fi
 
@@ -36,7 +36,7 @@ MODULEFILE_PATH="${MODULEFILE_DIR}/${VERSION}"
 mkdir -p "${MODULEFILE_DIR}"
 
 echo "[INFO] Generating conda modulefile..."
-echo "[INFO] Environment: ${ENV_PREFIX}"
+echo "[INFO] Environment: ${ENV_PREFIX}/env"
 
 # Generate the modulefile
 cat > "${MODULEFILE_PATH}" <<'EOFMOD'
@@ -49,7 +49,7 @@ EOFMOD
 
 # Add dynamic content to the modulefile
 cat >> "${MODULEFILE_PATH}" <<EOF
-set pkg_dir         $ENV_PREFIX
+set pkg_dir         $ENV_PREFIX/env
 set name            $PACKAGE
 set version         $VERSION
 
