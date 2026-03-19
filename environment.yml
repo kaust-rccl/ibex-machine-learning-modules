@@ -76,6 +76,9 @@ dependencies:
   - hvplot
   - holoviews
   - graphistry
+  - jupyter_bokeh
+  - bokeh
+  - panel
   
   # Development Tools
   - jupyterlab
